@@ -21,11 +21,15 @@ Confirm that the repositry is now in the local directory.
 Before you can push changes to the global repository or pull changes from it, you need to connect your local repository to the global one. To do this, follow these steps:
 
 Check if a remote already exists with the command:`git remote -v`
+
 If so, move on past this section
 
 1. Assuming there is no remote, open the terminal on your local machine.
+
 2. Navigate to the directory where you cloned the repository by running this command: `cd location/of/the/directory`
+
 3. Run the following command to add the global repository as a remote: `git remote add origin AIM-Robotics-2023-2024`
+
 4. Verify that the remote has been added by running the following command: `git remote -v`
 
 This should list the global repository as `origin`
