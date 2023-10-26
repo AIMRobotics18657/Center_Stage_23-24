@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.developmental;
 
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.NoFeedback;
+import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.PIDEx;
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedforward.FeedforwardEx;
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedforward.NoFeedforward;
 import com.ThermalEquilibrium.homeostasis.Filters.Estimators.LowPassEstimator;
@@ -14,8 +15,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.PIDEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
@@ -113,7 +114,6 @@ public class PIDSlides extends Mechanism{
         telemetry.addData("isSpeeding", isSpeeding);
         telemetry.addData("isReset", isReset);
         telemetry.addData("isResettingLifts", isResettingLifts);
-
     }
 
     public void setPower(double power) {

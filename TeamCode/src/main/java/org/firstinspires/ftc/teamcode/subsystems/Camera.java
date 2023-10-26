@@ -21,6 +21,7 @@ public class Camera extends Mechanism {
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
     boolean targetFound = false;
+  
     private final String webcamName = "Ray";
     private final int exposureMS = 4;
     private final int gain = 250;
