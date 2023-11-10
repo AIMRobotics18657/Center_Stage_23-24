@@ -16,16 +16,35 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Camera class represents a mechanism on the robot for vision processing using a webcam and AprilTags.
+ * It extends the Mechanism class and provides methods to interact with the camera, process AprilTag detections, and set exposure settings.
+ *
+ * @author Nate Schmelkin
+ */
+
 public class Camera extends Mechanism {
-    private VisionPortal visionPortal;               // Used to manage the video source.
-    private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
-    private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
+
+    // VisionPortal instance to manage the video source
+    private VisionPortal visionPortal;
+
+    // AprilTagProcessor instance for managing the AprilTag detection process
+    private AprilTagProcessor aprilTag;
+
+    // AprilTagDetection instance to hold data for a detected AprilTag
+    private AprilTagDetection desiredTag = null;
+
+    // Flag to track whether a target has been found
     boolean targetFound = false;
-  
+
+    // Webcam name identifier
     private final String webcamName = "Ray";
+
+    // Exposure settings for the camera
     private final int exposureMS = 4;
     private final int gain = 250;
 
+    // Tag IDs for different positions
     public static final int BLUE_LEFT_ID = 1;
     public static final int BLUE_CENTER_ID = 2;
     public static final int BLUE_RIGHT_ID = 3;
@@ -33,17 +52,28 @@ public class Camera extends Mechanism {
     public static final int RED_CENTER_ID = 5;
     public static final int RED_RIGHT_ID = 6;
 
+    /**
+     * Initialize method for the Camera mechanism.
+     * Builds AprilTagProcessor and VisionPortal instances, sets decimation, and configures exposure settings.
+     *
+     * @param hwMap references the robot's hardware map
+     */
     @Override
     public void init(HardwareMap hwMap) {
         aprilTag = new AprilTagProcessor.Builder().build();
         visionPortal = new VisionPortal.Builder()
-            .setCamera(hwMap.get(WebcamName.class, webcamName))
-            .addProcessor(aprilTag)
-            .build();
+                .setCamera(hwMap.get(WebcamName.class, webcamName))
+                .addProcessor(aprilTag)
+                .build();
         aprilTag.setDecimation(3);
         setManualExposure(exposureMS, gain);
     }
 
+    /**
+     * Telemetry method to display information about the detected AprilTag.
+     *
+     * @param telemetry references local telemetry
+     */
     @Override
     public void telemetry(Telemetry telemetry) {
         if (visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
@@ -65,6 +95,12 @@ public class Camera extends Mechanism {
         }
     }
 
+    /**
+     * Sets manual exposure settings for the camera.
+     *
+     * @param exposureMS desired exposure time in milliseconds
+     * @param gain desired gain value
+     */
     public void setManualExposure(int exposureMS, int gain) {
         if (visionPortal == null || visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
             return;
@@ -79,6 +115,11 @@ public class Camera extends Mechanism {
         gainControl.setGain(gain);
     }
 
+    /**
+     * Checks for and sets the desired AprilTag based on its ID.
+     *
+     * @param desiredTagID ID of the desired AprilTag
+     */
     public void checkAndSetDesiredTag(int desiredTagID) {
         List<AprilTagDetection> currentDetections = getDetections();
         boolean detectionFound = false; // Add this variable
@@ -109,6 +150,11 @@ public class Camera extends Mechanism {
         }
     }
 
+    /**
+     * Gets the pose data of the desired AprilTag.
+     *
+     * @return array containing range, bearing, and yaw if a target is found; null otherwise
+     */
     public double[] getDesiredTagPoseData() {
         if (targetFound) {
             return new double[] {desiredTag.ftcPose.range, desiredTag.ftcPose.bearing, desiredTag.ftcPose.yaw};
@@ -117,10 +163,20 @@ public class Camera extends Mechanism {
         }
     }
 
+    /**
+     * Gets the camera state from the VisionPortal.
+     *
+     * @return camera state
+     */
     public VisionPortal.CameraState getCameraState() {
         return visionPortal.getCameraState();
     }
 
+    /**
+     * Gets a list of AprilTag detections from the AprilTagProcessor.
+     *
+     * @return list of AprilTag detections
+     */
     public List<AprilTagDetection> getDetections() {
         return aprilTag.getDetections();
     }
