@@ -35,12 +35,10 @@ public class Camera extends Mechanism {
 
     private static TfodProcessor tfod; // Used for managing the TensorFlow Object detection process
 
-    private static final String TFOD_MODEL_ASSET = "CenterStage.tflite"; // Name of the model asset
+    private static final String TFOD_MODEL_ASSET = "ssd_mobilenet_v2_320x320_coco17_tpu_8.tflite"; // Name of the model asset
 
     private static final String[] LABELS = { // Labels for the model
-            "Pixel"
-            // "Blue Element",
-            // "Red Element"
+            "fork"
     };
 
     private static final int LEFT_MAX_THRESHOLD = 213;
