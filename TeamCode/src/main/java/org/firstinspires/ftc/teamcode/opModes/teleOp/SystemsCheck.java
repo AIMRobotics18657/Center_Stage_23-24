@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 public class SystemsCheck extends OpMode {
     Drivebase drivebase = new Drivebase(true);
     Odometry odometry = new Odometry();
-    Camera camera = new Camera();
+    Camera camera = new Camera(false);
     Claw claw = new Claw();
     Arm arm = new Arm();
     Intake intake = new Intake();
