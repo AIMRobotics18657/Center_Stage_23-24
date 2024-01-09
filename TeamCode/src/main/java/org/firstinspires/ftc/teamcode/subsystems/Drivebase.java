@@ -48,7 +48,7 @@ public class Drivebase extends Mechanism {
     @Override
     public void init(HardwareMap hwMap) {
         drive = new MecanumDrive(hwMap, new Pose2d(STARTING_X, STARTING_Y, STARTING_HEADING));
-        camera = new Camera();
+        camera = new Camera(false);
         camera.init(hwMap);
     }
 

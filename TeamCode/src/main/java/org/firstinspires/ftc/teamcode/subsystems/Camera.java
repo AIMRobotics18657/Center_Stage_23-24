@@ -52,7 +52,7 @@ public class Camera extends Mechanism {
      * Constructor for Camera
      * @param isCustomModel whether or not to use the custom model
      */
-    Camera(boolean isCustomModel) {
+    public Camera(boolean isCustomModel) {
         this.isCustomModel = isCustomModel;
     }
 
