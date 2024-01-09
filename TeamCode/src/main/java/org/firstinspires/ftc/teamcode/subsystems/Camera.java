@@ -44,6 +44,18 @@ public class Camera extends Mechanism {
     private static final int LEFT_MAX_THRESHOLD = 213;
     private static final int CENTER_MAX_THRESHOLD = 427;
 
+    private static final float MINIMUM_CONFIDENCE = 0.75f; // Minimum confidence for a detection to be considered valid
+
+    private boolean isCustomModel; // Whether or not to use the custom model
+
+    /**
+     * Constructor for Camera
+     * @param isCustomModel whether or not to use the custom model
+     */
+    Camera(boolean isCustomModel) {
+        this.isCustomModel = isCustomModel;
+    }
+
     /**
      * Initializes the camera and vision processors.
      * @param hwMap references the robot's hardware map
@@ -52,10 +64,16 @@ public class Camera extends Mechanism {
     public void init(HardwareMap hwMap) {
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
-        tfod = new TfodProcessor.Builder()
-                .setModelAssetName(TFOD_MODEL_ASSET)
-                .setModelLabels(LABELS)
-                .build();
+        if (isCustomModel) {
+            tfod = new TfodProcessor.Builder()
+                    .setModelAssetName(TFOD_MODEL_ASSET)
+                    .setModelLabels(LABELS)
+                    .build();
+        } else {
+            tfod = new TfodProcessor.Builder()
+                    .build();
+        }
+
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, ConfigInfo.camera.getDeviceName()))
                 .addProcessor(aprilTag)
@@ -63,7 +81,7 @@ public class Camera extends Mechanism {
                 .build();
         aprilTag.setDecimation(3);
         setManualExposure(exposureMS, gain);
-        tfod.setMinResultConfidence(0.75f);
+        tfod.setMinResultConfidence(MINIMUM_CONFIDENCE);
     }
 
     /**
