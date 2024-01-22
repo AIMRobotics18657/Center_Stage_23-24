@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -38,13 +39,102 @@ public class Camera extends Mechanism {
     private static final String TFOD_MODEL_ASSET = "ssd_mobilenet_v2_320x320_coco17_tpu_8.tflite"; // Name of the model asset
 
     private static final String[] LABELS = { // Labels for the model
-            "fork"
+            "person",
+            "bicycle",
+            "car",
+            "motorcycle",
+            "airplane",
+            "bus",
+            "train",
+            "truck",
+            "boat",
+            "traffic light",
+            "fire hydrant",
+            "???",
+            "stop sign",
+            "parking meter",
+            "bench",
+            "bird",
+            "cat",
+            "dog",
+            "horse",
+            "sheep",
+            "cow",
+            "elephant",
+            "bear",
+            "zebra",
+            "giraffe",
+            "???",
+            "backpack",
+            "umbrella",
+            "???",
+            "???",
+            "handbag",
+            "tie",
+            "suitcase",
+            "frisbee",
+            "skis",
+            "snowboard",
+            "sports ball",
+            "kite",
+            "baseball bat",
+            "baseball glove",
+            "skateboard",
+            "surfboard",
+            "tennis racket",
+            "bottle",
+            "???",
+            "wine glass",
+            "cup",
+            "fork",
+            "knife",
+            "spoon",
+            "bowl",
+            "banana",
+            "apple",
+            "sandwich",
+            "orange",
+            "broccoli",
+            "carrot",
+            "hot dog",
+            "pizza",
+            "donut",
+            "cake",
+            "chair",
+            "couch",
+            "potted plant",
+            "bed",
+            "???",
+            "dining table",
+            "???",
+            "???",
+            "toilet",
+            "???",
+            "tv",
+            "laptop",
+            "mouse",
+            "remote",
+            "keyboard",
+            "cell phone",
+            "microwave",
+            "oven",
+            "toaster",
+            "sink",
+            "refrigerator",
+            "???",
+            "book",
+            "clock",
+            "vase",
+            "scissors",
+            "teddy bear",
+            "hair drier",
+            "toothbrush"
     };
 
     private static final int LEFT_MAX_THRESHOLD = 213;
     private static final int CENTER_MAX_THRESHOLD = 427;
 
-    private static final float MINIMUM_CONFIDENCE = 0.75f; // Minimum confidence for a detection to be considered valid
+    private static final float MINIMUM_CONFIDENCE = 0.7f; // Minimum confidence for a detection to be considered valid
 
     private boolean isCustomModel; // Whether or not to use the custom model
 
@@ -241,5 +331,13 @@ public class Camera extends Mechanism {
             }
         }
         return 1;
+    }
+
+    @Override
+    public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
+        checkAndSetDesiredTag(-1);
+        telemetryTag(telemetry);
+        getTfodElementPos();
+        telemetryTfod(telemetry);
     }
 }

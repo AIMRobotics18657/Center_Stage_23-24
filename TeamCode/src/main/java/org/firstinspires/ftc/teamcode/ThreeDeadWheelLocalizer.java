@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
+
 @Config
 public final class ThreeDeadWheelLocalizer implements Localizer {
     public static class Params {
@@ -31,9 +33,9 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
     private int lastPar0Pos, lastPar1Pos, lastPerpPos;
 
     public ThreeDeadWheelLocalizer(HardwareMap hardwareMap, double inPerTick) {
-        par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "brd")));
-        par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "fld")));
-        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "frd")));
+        par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, ConfigInfo.leftFly.getDeviceName())));
+        par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class,  ConfigInfo.rightFly.getDeviceName())));
+        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, ConfigInfo.leftSlide.getDeviceName())));
 
         // TODO: reverse encoder directions if needed
         //   par0.setDirection(DcMotorSimple.Direction.REVERSE);

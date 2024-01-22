@@ -1,29 +1,41 @@
 package org.firstinspires.ftc.teamcode.opModes.teleOp;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 
 import org.firstinspires.ftc.teamcode.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.subsystems.Camera;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Drivebase;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Odometry;
+import org.firstinspires.ftc.teamcode.subsystems.PAL;
 import org.firstinspires.ftc.teamcode.subsystems.PIDSlides;
+import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 
 @TeleOp(name="SystemsCheck", group="AAA_COMPETITION")
 public class SystemsCheck extends OpMode {
-    Drivebase drivebase = new Drivebase(true);
+
+    private final String[] deviceNames = ConfigInfo.getAllDeviceNames();
+    private SystemCheckStage currentStage = SystemCheckStage.CONNECTION_CHECK;
+
+    // Enum representing the different stages
+    private enum SystemCheckStage {
+        CONNECTION_CHECK,
+        INDIVIDUAL_CHECK
+    }
+    Drivebase drivebase = new Drivebase(new Pose2d(0, 0, 0));
     Odometry odometry = new Odometry();
     Camera camera = new Camera(false);
     Claw claw = new Claw();
     Arm arm = new Arm();
-    Intake intake = new Intake();
     PIDSlides slides = new PIDSlides();
+    PAL pal = new PAL();
 
     enum TestingState {
-        DRIVEBASE, ODOMETRY, CAMERA, CLAW, ARM, INTAKE, SLIDES
+        DRIVEBASE, ODOMETRY, CLAW, ARM, SLIDES, PAL
     }
 
     TestingState activeTestingState = TestingState.DRIVEBASE;
@@ -32,120 +44,109 @@ public class SystemsCheck extends OpMode {
     public void init() {
         drivebase.init(hardwareMap);
         odometry.init(hardwareMap);
-        camera.init(hardwareMap);
         claw.init(hardwareMap);
         arm.init(hardwareMap);
-        intake.init(hardwareMap);
         slides.init(hardwareMap);
+        pal.init(hardwareMap);
     }
 
     @Override
     public void loop() {
-        switch (activeTestingState) {
-            case DRIVEBASE:
-                drivebaseTest();
+        switch (currentStage) {
+            case CONNECTION_CHECK:
+                // Stage 0: Check if all devices are connected
+                boolean allDevicesConnected = true;
+                for (String deviceName : deviceNames) {
+                    HardwareDevice device = hardwareMap.get(deviceName);
+                    if (device == null) {
+                        allDevicesConnected = false;
+                        telemetry.addData(deviceName, "Not connected");
+                    }
+                }
+
+                if (allDevicesConnected) {
+                    telemetry.addData("Stage 0: Connection Check", "All Devices Connected");
+                    telemetry.addData("Press lb & rb to Start Individual System Checks", "");
+                    // Check for button press to activate next stage
+                    if (gamepad1.right_bumper && gamepad1.left_bumper) {
+                        currentStage = SystemCheckStage.INDIVIDUAL_CHECK; // Transition to next stage
+                    }
+                } else {
+                    telemetry.addData("Stage 0: Connection Check", "Not all devices connected");
+                    telemetry.addData("Bypass with lt and rt", "");
+                    if (gamepad1.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && gamepad1.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
+                        currentStage = SystemCheckStage.INDIVIDUAL_CHECK; // Transition to next stage
+                    }
+                }
                 break;
-            case ODOMETRY:
-                odoTest();
-                break;
-            case CAMERA:
-                cameraTest();
-                break;
-            case CLAW:
-                clawTest();
-                break;
-            case ARM:
-                armTest();
-                break;
-            case INTAKE:
-                intakeTest();
-                break;
-            case SLIDES:
-                slidesTest();
-                break;
+
+            case INDIVIDUAL_CHECK:
+                // Stage 1: Individual system checks
+                telemetry.addData("Stage 1: Individual System Checks", "Performing Individual System Checks");
+                switch (activeTestingState) {
+                    case DRIVEBASE:
+                        drivebaseTest();
+                        break;
+                    case ODOMETRY:
+                        odoTest();
+                        break;
+                    case CLAW:
+                        clawTest();
+                        break;
+                    case ARM:
+                        armTest();
+                        break;
+                    case SLIDES:
+                        slidesTest();
+                        break;
+                    case PAL:
+                        palTest();
+                        break;
+                }
+                telemetry.addData("Current Testing State", activeTestingState);
+                telemetry.update();
         }
-        telemetry.addData("Current Testing State", activeTestingState);
-        telemetry.update();
     }
 
 
     public void drivebaseTest() {
-        drivebase.loop(gamepad1);
-        drivebase.telemetry(telemetry);
-        if (gamepad1.a && gamepad2.a) {
+        drivebase.systemsCheck(gamepad1, telemetry);
+        if (gamepad1.back && gamepad2.back) {
             activeTestingState = TestingState.ODOMETRY;
         }
     }
 
     public void odoTest() {
-        odometry.telemetry(telemetry);
-        if (gamepad1.a && gamepad2.a) {
-            activeTestingState = TestingState.CAMERA;
-        }
-    }
-
-    public void cameraTest() {
-        // TODO: Add camera test
-        if (gamepad1.a && gamepad2.a) {
+        odometry.systemsCheck(gamepad1, telemetry);
+        if (gamepad1.start && gamepad2.start) {
             activeTestingState = TestingState.CLAW;
         }
     }
 
     public void clawTest() {
-        if (gamepad1.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
-            claw.clampServo(claw.leftProng);
-        } else if (gamepad1.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
-            claw.clampServo(claw.rightProng);
-        } else {
-            claw.releaseServo(claw.leftProng);
-            claw.releaseServo(claw.rightProng);
-        }
-
-        if (gamepad1.a) {
-            claw.tilt(claw.tiltedLeftPos);
-        } else if (gamepad1.b) {
-            claw.tilt(claw.tiltedRightPos);
-        } else {
-            claw.tilt(claw.straight);
-        }
-        if (gamepad1.a && gamepad2.a) {
+        claw.systemsCheck(gamepad1, telemetry);
+        if (gamepad1.back && gamepad2.back) {
             activeTestingState = TestingState.ARM;
         }
     }
 
     public void armTest() {
-        if (gamepad1.a) {
-            arm.safeRetract();
-        } else if (gamepad1.b) {
-            arm.retract();
-        } else if (gamepad1.y){
-            arm.extend();
-        }
-        if (gamepad1.a && gamepad2.a) {
-            activeTestingState = TestingState.INTAKE;
-        }
-    }
-
-    public void intakeTest() {
-        // TODO: Add intake test
-        if (gamepad1.a && gamepad2.a) {
+        arm.systemsCheck(gamepad1, telemetry);
+        if (gamepad1.start && gamepad2.start) {
             activeTestingState = TestingState.SLIDES;
         }
     }
 
     public void slidesTest() {
-        if (Math.abs(gamepad1.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
-            slides.setPower(gamepad1.left_stick_y);
-        } else if (gamepad1.a) {
-            slides.update(PIDSlides.SAFE_RETRACTION_POS);
-        } else if (gamepad1.b) {
-            slides.update(PIDSlides.SAFE_EXTENSION_POS);
-        } else if (gamepad1.y) {
-            slides.update(PIDSlides.RESET_POS);
-        } else {
-            slides.holdPosition();
+        slides.systemsCheck(gamepad1, telemetry);
+        if (gamepad1.back && gamepad2.back) {
+            activeTestingState = TestingState.PAL;
         }
-        if (gamepad1.a && gamepad2.a) {
+    }
+
+    public void palTest() {
+        pal.systemsCheck(gamepad1, telemetry);
+        if (gamepad1.start && gamepad2.start) {
             activeTestingState = TestingState.DRIVEBASE;
         }
     }

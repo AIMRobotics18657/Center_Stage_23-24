@@ -18,14 +18,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
+import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
 
 import java.util.function.DoubleSupplier;
 
 
-public class PIDSlides extends Mechanism{
+public class PIDSlides extends Mechanism {
     private static final double KP = 0.001;
-    private static final double KI = 0;
+    private static final double KI = 0.000003;
     private static final double KD = 0.0005;
     private static final double INTEGRAL_SUM_MAX = 0;
     private static final double STABILITY_THRESHOLD = 0;
@@ -66,8 +67,15 @@ public class PIDSlides extends Mechanism{
 
     public static final int RESET_POS = 0;
 
-    public static final int SAFE_EXTENSION_POS = -1900;
-    public static final int SAFE_RETRACTION_POS = -1700;
+    public static final int SAFE_EXTENSION_POS = -1000;
+    public static final int SAFE_RETRACTION_POS = -1200;
+    public static final int SAFE_RESET_POS = -125;
+    public static final int HANGING_POS = -600;
+    public static final int FULL_EXTENSION_POS = -2120;
+
+    public static final int PURPLE_DROP_POS = -1000;
+
+    public static int activeResetPos = SAFE_RESET_POS;
 
     @Override
     public void init(HardwareMap hwMap) {
@@ -169,5 +177,41 @@ public class PIDSlides extends Mechanism{
 
     public boolean isAtTargetPosition() {
         return Math.abs(getSlidesPosition() - targetPos) < PROXIMITY_THRESHOLD;
+    }
+
+    public void setSafeResetPos() {
+        activeResetPos = SAFE_RESET_POS;
+    }
+
+    public void setResetPos() {
+        activeResetPos = RESET_POS;
+    }
+
+    public int getActiveResetPos() {
+        return activeResetPos;
+    }
+
+    @Override
+    public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
+        if (Math.abs(gamepad.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
+            setPower(gamepad.left_stick_y);
+        } else if (gamepad.a) {
+            update(SAFE_RETRACTION_POS);
+        } else if (gamepad.b) {
+            update(SAFE_EXTENSION_POS);
+        } else if (gamepad.y) {
+            update(RESET_POS);
+        } else {
+            holdPosition();
+        }
+        telemetry.addData("leftSlidePos", leftSlide.getCurrentPosition());
+        telemetry.addData("rightSlidePos", rightSlide.getCurrentPosition());
+        telemetry.addData("Target Position", targetPos);
+        telemetry.addData("leftSlideVelo", leftSlide.getVelocity());
+        telemetry.addData("rightSlideVelo", rightSlide.getVelocity());
+        telemetry.addData("leftSlidePower", leftSlide.getPower());
+        telemetry.addData("rightSlidePower", rightSlide.getPower());
+        telemetry.addData("isSpeeding", isSpeeding);
+        telemetry.addData("isAtTargetPosition", isAtTargetPosition());
     }
 }

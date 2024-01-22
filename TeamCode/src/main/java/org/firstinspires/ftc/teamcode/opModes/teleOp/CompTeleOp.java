@@ -17,6 +17,11 @@ public class CompTeleOp extends OpMode {
     }
 
     @Override
+    public void start() {
+        robot.start();
+    }
+
+    @Override
     public void loop() {
         robot.loop(gamepad1, gamepad2);
         robot.telemetry(telemetry);
