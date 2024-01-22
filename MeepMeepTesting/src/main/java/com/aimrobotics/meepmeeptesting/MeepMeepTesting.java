@@ -15,10 +15,12 @@ public class MeepMeepTesting {
                 .setDimensions(15, 18)
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(12, -61, Math.toRadians(90)))
-                                .lineToSplineHeading(new Pose2d(12, -24, Math.toRadians(0)))
-                                .lineTo(new Vector2d(50, -36))
-                                .build()
+                                drive.trajectorySequenceBuilder(new Pose2d(12, -61, Math.toRadians(90)))
+//                                .splineToSplineHeading(new Pose2d(11, -30, Math.toRadians(180)), Math.toRadians(90))
+//                                .splineToSplineHeading(new Pose2d(22, -25, Math.toRadians(180)), Math.toRadians(90))
+                                        .splineToSplineHeading(new Pose2d(33, -30, Math.toRadians(180)), Math.toRadians(90))
+                                        .lineToLinearHeading(new Pose2d(50, -36, Math.toRadians(0)))
+                                        .build()
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)

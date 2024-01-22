@@ -1,83 +1,83 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.FULL_EXTENSION_POS;
+import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.HANGING_POS;
+import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.RESET_POS;
+import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.SAFE_EXTENSION_POS;
+import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.SAFE_RETRACTION_POS;
+
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
+import org.opencv.core.Mat;
 
 public class PixelManipulator extends Mechanism {
 
     public Arm arm;
     public Claw claw;
-    public Intake intake;
     public PIDSlides slides;
 
 
     enum ScoringState {
-        PICKING_UP, PIXELSLOADED_ONE, PIXELSLOADED_TWO, POSITIONING, RELEASINGLEFT, RELEASINGRIGHT, RESETTING_STAGE_ONE, RESETTING_STAGE_TWO, FULL_MANUAL
+        PICKING_UP, PIXELSLOADED_ONE, PIXELSLOADED_TWO, POSITIONING, RELEASINGLEFT, RELEASINGRIGHT, RESETTING_STAGE_ONE, RESETTING_STAGE_TWO, FULL_MANUAL, HANGING
     }
 
     ScoringState activeScoringState = ScoringState.RESETTING_STAGE_TWO;
+    boolean hangModeEnabled = false;
 
     @Override
     public void init(HardwareMap hwMap) {
-        intake = new Intake();
         claw = new Claw();
         arm = new Arm();
         slides = new PIDSlides();
 
-        intake.init(hwMap);
         claw.init(hwMap);
         arm.init(hwMap);
         slides.init(hwMap);
         arm.retract();
+        setHangModeEnabled(false);
     }
 
     @Override
     public void loop(Gamepad gamepad, Gamepad gamepad2) {
-        intake.loop(gamepad);
         claw.loop(gamepad);
         arm.loop(gamepad);
         slides.loop(gamepad);
 
-        boolean isPixelsLoaded = claw.isLeftClamped && claw.isRightClamped;
-
         boolean isReleasable = !slides.isSpeeding();
 
-        boolean manualOverride = gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up;
+        boolean manualOverride = gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a; // TODO ADD IN BUTTON PRESSES
+        boolean hangMode = gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.dpad_up; // TODO ADD IN BUTTON PRESSES
 
 
         if (manualOverride) {
             setActiveScoringState(ScoringState.FULL_MANUAL);
         }
+        if (hangMode) { // && hangModeEnabled
+            setActiveScoringState(ScoringState.HANGING);
+        }
 
         switch (activeScoringState) {
             case PICKING_UP:
+                slides.update(slides.getActiveResetPos());
                 if (gamepad2.y) {
-                    intake.outtake(1);
+                    claw.outtake();
                 } else {
-                    intake.intake(1);
+                    claw.intake();
                 }
-                if (gamepad2.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
-                    claw.clampServo(claw.leftProng);
-                } else if (gamepad2.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
-                    claw.clampServo(claw.rightProng);
-                } else if (gamepad2.left_bumper) {
-                    claw.releaseLeftServo(claw.leftProng);
-                } else if (gamepad2.right_bumper) {
-                    claw.releaseServo(claw.rightProng);
-                }
-                if (isPixelsLoaded && gamepad2.a) {
+                if (gamepad2.a) {
                     setActiveScoringState(ScoringState.PIXELSLOADED_ONE);
                 }
                 break;
 
             case PIXELSLOADED_ONE:
-                intake.stop();
-                arm.safeRetract();
-                slides.update(PIDSlides.SAFE_EXTENSION_POS);
+                if (gamepad2.y) {
+                    claw.outtake();
+                }
+                slides.update(SAFE_EXTENSION_POS);
                 if (slides.isAtTargetPosition()) {
                     setActiveScoringState(ScoringState.PIXELSLOADED_TWO);
                 }
@@ -86,6 +86,7 @@ public class PixelManipulator extends Mechanism {
             case PIXELSLOADED_TWO:
                 arm.extend();
                 if (arm.isExtended && gamepad2.a) {
+                    claw.stopIntake();
                     setActiveScoringState(ScoringState.POSITIONING);
                 }
                 break;
@@ -106,7 +107,7 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RELEASINGLEFT:
-                claw.releaseLeftServo(claw.leftProng);
+                claw.releaseServo(claw.leftClamp);
                 if (claw.isLeftReleased && claw.isRightReleased) {
                     activeScoringState = ScoringState.RESETTING_STAGE_ONE;
                 }
@@ -116,7 +117,7 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RELEASINGRIGHT:
-                claw.releaseServo(claw.rightProng);
+                claw.releaseServo(claw.rightClamp);
                 if (claw.isLeftReleased && claw.isRightReleased) {
                     activeScoringState = ScoringState.RESETTING_STAGE_ONE;
                 }
@@ -126,60 +127,68 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RESETTING_STAGE_ONE:
-                slides.update(PIDSlides.SAFE_RETRACTION_POS);
+                slides.update(SAFE_RETRACTION_POS);
                 if (slides.isAtTargetPosition()) {
-                    arm.safeRetract();
-                    if (gamepad2.a && gamepad2.x && gamepad2.y) {
+                    arm.retract();
+                    claw.clampServo(claw.leftClamp);
+                    claw.clampServo(claw.rightClamp);
+                    if (gamepad2.a) {
                         setActiveScoringState(ScoringState.RESETTING_STAGE_TWO);
                     }
                 }
                 break;
 
             case RESETTING_STAGE_TWO:
-                slides.update(PIDSlides.RESET_POS);
-                claw.releaseLeftServo(claw.leftProng);
-                claw.releaseServo(claw.rightProng);
+                slides.update(slides.getActiveResetPos());
+                arm.retract();
+                claw.clampServo(claw.leftClamp);
+                claw.clampServo(claw.rightClamp);
                 if (slides.isAtTargetPosition()) {
-                    arm.retract();
                     setActiveScoringState(ScoringState.PICKING_UP);
                 }
                 break;
             case FULL_MANUAL:
                 if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
                     slides.setPower(gamepad2.left_stick_y);
+                } else if (gamepad2.a) {
+                    slides.update(SAFE_RETRACTION_POS);
+                } else if (gamepad2.b) {
+                    slides.update(SAFE_EXTENSION_POS);
+                } else if (gamepad2.y) {
+                    slides.update(slides.getActiveResetPos());
                 } else {
                     slides.holdPosition();
                 }
 
-                if (gamepad2.left_bumper) {
-                    claw.clampServo(claw.leftProng);
-                } else if (gamepad2.right_bumper) {
-                    claw.clampServo(claw.rightProng);
+                if (gamepad2.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
+                    claw.intake();
                 } else if (gamepad2.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
-                    claw.releaseLeftServo(claw.leftProng);
-                } else if (gamepad2.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
-                    claw.releaseServo(claw.rightProng);
+                    claw.outtake();
+                } else {
+                    claw.stopIntake();
                 }
 
-                if (gamepad2.a) {
+                if (gamepad2.dpad_up) {
                     arm.extend();
-                } else if (gamepad2.y) {
+                } else if (gamepad2.dpad_down) {
                     arm.retract();
-                } else if (Math.abs(gamepad2.right_stick_y) > GamepadSettings.GP2_TRIGGER_DEADZONE) {
-                    arm.setPower(gamepad2.right_stick_y * .002);
+                }
+            case HANGING:
+                arm.retract();
+                claw.stopIntake();
+                if (gamepad2.dpad_up) {
+                    slides.update(FULL_EXTENSION_POS);
+                } else if (gamepad2.dpad_down) {
+                    slides.update(slides.getActiveResetPos());
+                } else if (gamepad2.dpad_left) {
+                    slides.update(HANGING_POS);
                 }
 
-                if (gamepad2.x) {
-                    intake.intake(1);
-                } else if (gamepad2.b) {
-                    intake.outtake(1);
-                }
         }
     }
 
     @Override
     public void telemetry(Telemetry telemetry) {
-        intake.telemetry(telemetry);
         claw.telemetry(telemetry);
         arm.telemetry(telemetry);
         slides.telemetry(telemetry);
@@ -188,5 +197,9 @@ public class PixelManipulator extends Mechanism {
 
     public void setActiveScoringState(ScoringState state) {
         activeScoringState = state;
+    }
+
+    public void setHangModeEnabled(boolean hangModeEnabled) {
+        this.hangModeEnabled = hangModeEnabled;
     }
 }

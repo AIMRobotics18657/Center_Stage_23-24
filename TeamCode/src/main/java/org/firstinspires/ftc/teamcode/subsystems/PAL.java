@@ -1,38 +1,62 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
+import org.firstinspires.ftc.teamcode.util.ServoUtil;
 
 public class PAL extends Mechanism {
 
-    Servo releaser;
-    CRServo fire;
+    private DcMotorEx leftFly;
+    private DcMotorEx rightFly;
+    private Servo releaseServo;
 
-    double holdPos = 0.25;
-    double releasePos = .5;
+    private static final double RELEASE_POSITION = 0;
+    private static final double RETRACT_POSITION = 0.18;
     @Override
     public void init(HardwareMap hwMap) {
-        releaser = hwMap.get(Servo.class, ConfigInfo.releaser.getDeviceName());
-        fire = hwMap.get(CRServo.class, ConfigInfo.fire.getDeviceName());
-        releaser.setPosition(holdPos);
-        fire.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFly = hwMap.get(DcMotorEx.class, ConfigInfo.leftFly.getDeviceName());
+        rightFly = hwMap.get(DcMotorEx.class, ConfigInfo.rightFly.getDeviceName());
+        releaseServo = hwMap.get(Servo.class, ConfigInfo.releaseServo.getDeviceName());
+
+        leftFly.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftFly.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        rightFly.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        releaseServo.setPosition(RETRACT_POSITION);
     }
 
     @Override
     public void loop(Gamepad gamepad) {
-        if (gamepad.dpad_left && gamepad.x) {
-            releaser.setPosition(releasePos);
+        leftFly.setPower(gamepad.right_trigger);
+        rightFly.setPower(gamepad.right_trigger);
+        if (gamepad.dpad_up) {
+            releaseServo.setPosition(RELEASE_POSITION);
         }
-        if (gamepad.dpad_up && gamepad.y) {
-            fire.setPower(1);
-        } else {
-            fire.setPower(0);
+    }
+
+    @Override
+    public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
+        leftFly.setPower(gamepad.right_trigger);
+        rightFly.setPower(gamepad.right_trigger);
+        if (gamepad.dpad_up) {
+            releaseServo.setPosition(RELEASE_POSITION);
+        } else if (gamepad.dpad_down) {
+            releaseServo.setPosition(RETRACT_POSITION);
+        } else if (gamepad.dpad_left) {
+            ServoUtil.increment(releaseServo, 0.01);
+        } else if (gamepad.dpad_right) {
+            ServoUtil.increment(releaseServo, -0.01);
         }
+        telemetry.addData("Left Flywheel Power: ", leftFly.getPower());
+        telemetry.addData("Right Flywheel Power: ", rightFly.getPower());
+        telemetry.addData("Release Servo Position: ", releaseServo.getPosition());
     }
 }

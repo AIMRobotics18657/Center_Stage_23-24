@@ -7,18 +7,22 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
+import org.firstinspires.ftc.teamcode.util.ServoUtil;
 
 
 public class Arm extends Mechanism {
     public Servo leftArm;
     public Servo rightArm;
-    double extendedPosition = .28;
-    double retractedPosition = 0.04;
-    double safeRetractedPosition = 0.04;
+    private static final double EXTENDED_POSITION = 0.67;
+    private static final double RETRACTED_POSITION = 1;
+    private static final double FULL_RETRACTED = 0.97;
+
+    private static final double CLOSE_THRESHOLD = 0.01;
+
+    private static double activeRetractPos = RETRACTED_POSITION;
 
     public boolean isExtended = false;
     public boolean isRetracted = false;
-    public boolean isSafeRetracted = false;
 
     @Override
     public void init(HardwareMap hwMap) {
@@ -29,9 +33,8 @@ public class Arm extends Mechanism {
 
     @Override
     public void loop(Gamepad gamepad) {
-        isExtended = Math.abs(leftArm.getPosition() - extendedPosition) < 0.01 && Math.abs(rightArm.getPosition() - extendedPosition) < 0.01;
-        isRetracted = Math.abs(leftArm.getPosition() - retractedPosition) < 0.01 && Math.abs(rightArm.getPosition() - retractedPosition) < 0.01;
-        isSafeRetracted = Math.abs(leftArm.getPosition() - safeRetractedPosition) < 0.01 && Math.abs(rightArm.getPosition() - safeRetractedPosition) < 0.01;
+        isExtended = ServoUtil.isClose(leftArm, EXTENDED_POSITION, CLOSE_THRESHOLD) && ServoUtil.isClose(rightArm, EXTENDED_POSITION, CLOSE_THRESHOLD);
+        isRetracted = ServoUtil.isClose(leftArm, activeRetractPos, CLOSE_THRESHOLD) && ServoUtil.isClose(rightArm, activeRetractPos, CLOSE_THRESHOLD);
     }
 
     @Override
@@ -43,22 +46,38 @@ public class Arm extends Mechanism {
     }
 
     public void extend() {
-        leftArm.setPosition(extendedPosition);
-        rightArm.setPosition(extendedPosition);
+        leftArm.setPosition(EXTENDED_POSITION);
+        rightArm.setPosition(EXTENDED_POSITION);
     }
 
     public void retract() {
-        leftArm.setPosition(retractedPosition);
-        rightArm.setPosition(retractedPosition);
+        leftArm.setPosition(activeRetractPos);
+        rightArm.setPosition(activeRetractPos);
     }
 
-    public void safeRetract() {
-        leftArm.setPosition(safeRetractedPosition);
-        rightArm.setPosition(safeRetractedPosition);
+    public void setSafeRetractPos() {
+        activeRetractPos = FULL_RETRACTED;
     }
 
-    public void setPower(double input) {
-        leftArm.setPosition(extendedPosition + input);
-        rightArm.setPosition(extendedPosition + input);
+    public void setRetractPos() {
+        activeRetractPos = RETRACTED_POSITION;
+    }
+
+    @Override
+    public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
+        if (gamepad.a) {
+            extend();
+        } else if (gamepad.b) {
+            retract();
+        } else if (gamepad.dpad_up) {
+            ServoUtil.increment(leftArm, rightArm, 0.01);
+        } else if (gamepad.dpad_down) {
+            ServoUtil.increment(leftArm, rightArm, -0.01);
+        }
+
+        telemetry.addData("Left Arm Position:", leftArm.getPosition());
+        telemetry.addData("Right Arm Position:", rightArm.getPosition());
+        telemetry.addData("isExtended: ", isExtended);
+        telemetry.addData("isRetracted: ", isRetracted);
     }
 }

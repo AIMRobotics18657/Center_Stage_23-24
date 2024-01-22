@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 // This TeleOp tests the drivebase mechanism class
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,7 +16,7 @@ public class DrivebaseSubsystemTester extends OpMode {
 
     @Override
     public void init() {
-        drivebase = new Drivebase(true);
+        drivebase = new Drivebase(new Pose2d(0, 0, 0));
         drivebase.init(hardwareMap);
     }
 

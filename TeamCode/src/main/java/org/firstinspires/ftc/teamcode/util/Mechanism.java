@@ -50,4 +50,11 @@ public abstract class Mechanism {
      */
 
     public void telemetry(Telemetry telemetry) { }
+
+    /**
+     * Method to handle a system check for a given mechanism
+     *
+     * @param gamepad references gamepad in slot one
+     */
+    public void systemsCheck(Gamepad gamepad, Telemetry telemetry) { }
 }

@@ -5,31 +5,49 @@ import org.firstinspires.ftc.teamcode.util.HardwareInterface;
 public class ConfigInfo {
 
     // ARM
-    public static HardwareInterface leftArm = new HardwareInterface("leftArm", false, 0);
-    public static HardwareInterface rightArm = new HardwareInterface("rightArm", false, 0);
+    public static HardwareInterface leftArm = new HardwareInterface("LA", true, 0);
+    public static HardwareInterface rightArm = new HardwareInterface("RA", false, 0);
 
     // CLAW
-    public static HardwareInterface rotator = new HardwareInterface("rotator", false, 0);
-    public static HardwareInterface leftProng = new HardwareInterface("leftProng", false, 0);
-    public static HardwareInterface rightProng = new HardwareInterface("rightProng", false, 0);
+    public static HardwareInterface intake = new HardwareInterface("SS", true, 2);
+    public static HardwareInterface leftClamp = new HardwareInterface("LC", true, 1);
+    public static HardwareInterface rightClamp = new HardwareInterface("RC", false, 1);
 
     // DRIVEBASE
-    public static HardwareInterface leftFront = new HardwareInterface("fld", false, 0);
-    public static HardwareInterface rightFront = new HardwareInterface("frd", false, 0);
-    public static HardwareInterface leftBack = new HardwareInterface("bld", false, 0);
-    public static HardwareInterface rightBack = new HardwareInterface("brd", false, 0);
-
-    // INTAKE
-    public static HardwareInterface intake = new HardwareInterface("intake", false, 0);
+    public static HardwareInterface leftFront = new HardwareInterface("FLD", true, 1);
+    public static HardwareInterface rightFront = new HardwareInterface("FRD", false, 1);
+    public static HardwareInterface leftBack = new HardwareInterface("BLD", true, 0);
+    public static HardwareInterface rightBack = new HardwareInterface("BRD", false, 0);
 
     // PAL
-    public static HardwareInterface releaser = new HardwareInterface("releaser", false, 0);
-    public static HardwareInterface fire = new HardwareInterface("fire", false, 0);
+    public static HardwareInterface leftFly = new HardwareInterface("PAL", true, 3);
+    public static HardwareInterface rightFly = new HardwareInterface("PAR", false, 3);
+    public static HardwareInterface releaseServo = new HardwareInterface("REL", false, 2);
 
     // SLIDES
-    public static HardwareInterface leftSlide = new HardwareInterface("leftSlide", false, 0);
-    public static HardwareInterface rightSlide = new HardwareInterface("rightSlide", false, 0);
+    public static HardwareInterface leftSlide = new HardwareInterface("LL", false, 2);
+    public static HardwareInterface rightSlide = new HardwareInterface("RL", true, 2);
 
     // CAMERA
     public static HardwareInterface camera = new HardwareInterface("Ray", true, 0);
+
+    public static String[] getAllDeviceNames() {
+        return new String[] {
+            leftArm.getDeviceName(),
+            rightArm.getDeviceName(),
+            intake.getDeviceName(),
+            leftClamp.getDeviceName(),
+            rightClamp.getDeviceName(),
+            leftFront.getDeviceName(),
+            rightFront.getDeviceName(),
+            leftBack.getDeviceName(),
+            rightBack.getDeviceName(),
+            leftFly.getDeviceName(),
+            rightFly.getDeviceName(),
+            releaseServo.getDeviceName(),
+            leftSlide.getDeviceName(),
+            rightSlide.getDeviceName(),
+            camera.getDeviceName()
+        };
+    }
 }

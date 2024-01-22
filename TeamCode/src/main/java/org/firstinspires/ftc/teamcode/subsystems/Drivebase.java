@@ -15,17 +15,14 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 public class Drivebase extends Mechanism {
 
-    private static final double STARTING_X = 12;
-    private static double STARTING_Y = -63;
-    private static double STARTING_HEADING = Math.PI/2;
-
+    private static Pose2d STARTING_POS;
     private static final double RANGE_KP = 0.02;
     private static final double YAW_KP = 0.03;
 
-    public Camera camera;
+    private Camera camera;
     public MecanumDrive drive;
 
-    final double speedClamp = 1;
+    private final double speedClamp = 1;
 
     private static final double MAX_AUTO_SPEED = 0.65;
     private static final double MAX_AUTO_TURN = 0.5;
@@ -33,27 +30,25 @@ public class Drivebase extends Mechanism {
     private static final double SPEED_CLAMP_DIST = 8.0;
     private static final double DETECTION_ZONE = 24.0;
 
-    private boolean isCameraControlling = false;
+    private static boolean drivebaseSpeeding = false;
+    private static final double SPEEDING_CONST = 0.1;
 
-    public Drivebase(boolean isRedAlliance) {
-        if (isRedAlliance) {
-            STARTING_HEADING = Math.PI/2;
-            STARTING_Y = -63;
-        } else {
-            STARTING_HEADING = 3*Math.PI/2;
-            STARTING_Y = 63;
-        }
+    private static boolean isCameraControlling = false;
+
+    public Drivebase(Pose2d startingPose) {
+        STARTING_POS = startingPose;
     }
 
     @Override
     public void init(HardwareMap hwMap) {
-        drive = new MecanumDrive(hwMap, new Pose2d(STARTING_X, STARTING_Y, STARTING_HEADING));
+        drive = new MecanumDrive(hwMap, STARTING_POS);
         camera = new Camera(false);
         camera.init(hwMap);
     }
 
     @Override
     public void loop(Gamepad gamepad) {
+        drivebaseSpeeding = drive.leftBack.getPower() > SPEEDING_CONST || drive.leftFront.getPower() > SPEEDING_CONST || drive.rightBack.getPower() > SPEEDING_CONST || drive.rightFront.getPower() > SPEEDING_CONST;
         if (camera.getCameraState() == VisionPortal.CameraState.STREAMING) {
 //            camera.checkAndSetDesiredTag(Camera.BLUE_CENTER_ID);
             camera.checkAndSetDesiredTag(-1);
@@ -66,11 +61,16 @@ public class Drivebase extends Mechanism {
     @Override
     public void telemetry(Telemetry telemetry) {
         camera.telemetry(telemetry);
+        telemetry.addData("DrivebaseSpeeding", isSpeeding());
         telemetry.addData("speedClamp", speedClamp);
         telemetry.addData("Pose Data", camera.getDesiredTagPoseData());
         telemetry.addData("Target Found", camera.targetFound);
         telemetry.addData("Current Detections", camera.getDetections());
         telemetry.addData("isCameraControlling", isCameraControlling);
+    }
+
+    public boolean isSpeeding() {
+        return drivebaseSpeeding;
     }
 
     public double poweredInput(double base) {
@@ -136,5 +136,19 @@ public class Drivebase extends Mechanism {
                 }
             }
         }
+    }
+
+    public int getGameRandomization() {
+        return camera.getTfodElementPos();
+    }
+
+    @Override
+    public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
+        drive.setDrivePowers(stickOnly(-gamepad.left_stick_y, -gamepad.left_stick_x, -gamepad.right_stick_x));
+        telemetry.addData("speedClamp", speedClamp);
+        telemetry.addData("Pose Data", camera.getDesiredTagPoseData());
+        telemetry.addData("Target Found", camera.targetFound);
+        telemetry.addData("Current Detections", camera.getDetections());
+        telemetry.addData("isCameraControlling", isCameraControlling);
     }
 }
