@@ -44,7 +44,7 @@ public class Robot extends Mechanism {
         timer.loop(gamepad);
 
         isEndGame = timer.getTime() > ENDGAME_TIMESTAMP;
-        isDrivebaseSpeeding = drivebase.isSpeeding();
+        isDrivebaseSpeeding = drivebase.isDriveSpeeding();
         if (isEndGame) {
             pal.loop(gamepad);
             pixelManipulator.setHangModeEnabled(true);
