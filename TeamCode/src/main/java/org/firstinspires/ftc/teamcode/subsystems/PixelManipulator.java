@@ -79,17 +79,19 @@ public class PixelManipulator extends Mechanism {
                 }
                 slides.update(SAFE_EXTENSION_POS);
                 if (slides.isAtTargetPosition()) {
-                    setActiveScoringState(ScoringState.PIXELSLOADED_TWO);
-                }
-                break;
-
-            case PIXELSLOADED_TWO:
-                arm.extend();
-                if (arm.isExtended && gamepad2.a) {
+                    arm.extend();
                     claw.stopIntake();
                     setActiveScoringState(ScoringState.POSITIONING);
                 }
                 break;
+
+//            case PIXELSLOADED_TWO:
+//                arm.extend();
+//                if (arm.isExtended && gamepad2.a) {
+//                    claw.stopIntake();
+//                    setActiveScoringState(ScoringState.POSITIONING);
+//                }
+//                break;
 
 
             case POSITIONING:

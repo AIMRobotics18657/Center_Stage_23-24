@@ -31,6 +31,9 @@ public class ConfigInfo {
     // CAMERA
     public static HardwareInterface camera = new HardwareInterface("Ray", true, 0);
 
+    // IMU
+    public static HardwareInterface imu = new HardwareInterface("imu", false, 0);
+
     public static String[] getAllDeviceNames() {
         return new String[] {
             leftArm.getDeviceName(),
@@ -47,7 +50,8 @@ public class ConfigInfo {
             releaseServo.getDeviceName(),
             leftSlide.getDeviceName(),
             rightSlide.getDeviceName(),
-            camera.getDeviceName()
+            camera.getDeviceName(),
+            imu.getDeviceName()
         };
     }
 }
