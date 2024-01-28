@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.ServoUtil;
 public class Arm extends Mechanism {
     public Servo leftArm;
     public Servo rightArm;
-    private static final double EXTENDED_POSITION = 0.67;
+    private static final double EXTENDED_POSITION = 0.63;
     private static final double RETRACTED_POSITION = 1;
     private static final double FULL_RETRACTED = 0.97;
 

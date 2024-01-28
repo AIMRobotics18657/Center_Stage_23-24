@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.subsystems.Camera;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivebase;
 import org.firstinspires.ftc.teamcode.subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.subsystems.PAL;
 import org.firstinspires.ftc.teamcode.subsystems.PIDSlides;
+import org.firstinspires.ftc.teamcode.subsystems.Position;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 
@@ -26,8 +28,8 @@ public class SystemsCheck extends OpMode {
         CONNECTION_CHECK,
         INDIVIDUAL_CHECK
     }
-    Drivebase drivebase = new Drivebase(new Pose2d(0, 0, 0));
-    Odometry odometry = new Odometry();
+    Drivebase drivebase = new Drivebase(new Pose2d(0, 0, 0), new Position(0, 0, 0));
+    Odometry odometry;
     Camera camera = new Camera(false);
     Claw claw = new Claw();
     Arm arm = new Arm();
@@ -39,9 +41,9 @@ public class SystemsCheck extends OpMode {
     }
 
     TestingState activeTestingState = TestingState.DRIVEBASE;
-
     @Override
     public void init() {
+        odometry = new Odometry(hardwareMap);
         drivebase.init(hardwareMap);
         odometry.init(hardwareMap);
         claw.init(hardwareMap);
@@ -111,42 +113,42 @@ public class SystemsCheck extends OpMode {
 
     public void drivebaseTest() {
         drivebase.systemsCheck(gamepad1, telemetry);
-        if (gamepad1.back && gamepad2.back) {
+        if (gamepad1.back) {
             activeTestingState = TestingState.ODOMETRY;
         }
     }
 
     public void odoTest() {
         odometry.systemsCheck(gamepad1, telemetry);
-        if (gamepad1.start && gamepad2.start) {
+        if (gamepad1.start) {
             activeTestingState = TestingState.CLAW;
         }
     }
 
     public void clawTest() {
         claw.systemsCheck(gamepad1, telemetry);
-        if (gamepad1.back && gamepad2.back) {
+        if (gamepad1.back) {
             activeTestingState = TestingState.ARM;
         }
     }
 
     public void armTest() {
         arm.systemsCheck(gamepad1, telemetry);
-        if (gamepad1.start && gamepad2.start) {
+        if (gamepad1.start) {
             activeTestingState = TestingState.SLIDES;
         }
     }
 
     public void slidesTest() {
         slides.systemsCheck(gamepad1, telemetry);
-        if (gamepad1.back && gamepad2.back) {
+        if (gamepad1.back) {
             activeTestingState = TestingState.PAL;
         }
     }
 
     public void palTest() {
         pal.systemsCheck(gamepad1, telemetry);
-        if (gamepad1.start && gamepad2.start) {
+        if (gamepad1.start) {
             activeTestingState = TestingState.DRIVEBASE;
         }
     }

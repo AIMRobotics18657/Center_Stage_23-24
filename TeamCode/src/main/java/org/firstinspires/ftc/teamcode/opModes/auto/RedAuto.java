@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Autonomous(name = "rrAutoTest", group = "Tests")
 public final class RedAuto extends LinearOpMode {
-    Robot robot = new Robot(true);
+    Robot robot = new Robot(true, 0, 0, 0);
     int randomization = 1;
 
     private static final int sleepMs = 1000;

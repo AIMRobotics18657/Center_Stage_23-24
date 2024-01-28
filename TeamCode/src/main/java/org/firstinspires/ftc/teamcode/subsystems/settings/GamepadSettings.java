@@ -6,7 +6,7 @@ public class GamepadSettings {
     public static final int EXPONENT_MODIFIER = 2;
     public static final double VX_WEIGHT = 1;
     public static final double VY_WEIGHT = 1;
-    public static final double VRX_WEIGHT = .8;
+    public static final double VRX_WEIGHT = .9;
     public static final double GP1_STICK_DEADZONE = 0.08;
 
     // GAMEPAD 2

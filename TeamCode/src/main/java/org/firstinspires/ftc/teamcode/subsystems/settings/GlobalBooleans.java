@@ -4,6 +4,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 public class GlobalBooleans {
 
-    Robot robot = new Robot(false);
+    Robot robot = new Robot(false, 0, 0, 0);
 
 }

@@ -17,12 +17,16 @@ public class IMU_Controller extends Mechanism {
             RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
     private IMU imu;
 
-        @Override
-        public void init(HardwareMap hwMap) {
+        public IMU_Controller(HardwareMap hwMap) {
             imu = hwMap.get(IMU.class, ConfigInfo.imu.getDeviceName());
             imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
                     logoFacingDirection, usbFacingDirection))
             );
+            imu.resetYaw();
+        }
+
+        @Override
+        public void init(HardwareMap hwMap) {
 
         }
 

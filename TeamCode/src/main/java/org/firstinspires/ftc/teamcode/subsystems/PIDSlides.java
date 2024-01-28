@@ -26,7 +26,7 @@ import java.util.function.DoubleSupplier;
 
 public class PIDSlides extends Mechanism {
     private static final double KP = 0.001;
-    private static final double KI = 0.000003;
+    private static final double KI = 0.000016;
     private static final double KD = 0.0005;
     private static final double INTEGRAL_SUM_MAX = 0;
     private static final double STABILITY_THRESHOLD = 0;

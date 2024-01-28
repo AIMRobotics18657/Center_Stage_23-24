@@ -17,18 +17,26 @@ public class Robot extends Mechanism {
 
     PAL pal;
 
+    private double startingX;
+    private double startingY;
+    private double startingHeading;
+
     boolean isRedAlliance;
     boolean isEndGame = false;
     boolean isDrivebaseSpeeding = false;
     private static final int ENDGAME_TIMESTAMP = 90;
 
-    public Robot(boolean isRedAlliance) {
+    public Robot(boolean isRedAlliance, double startingX, double startingY, double startingHeading) {
         this.isRedAlliance = isRedAlliance;
+        this.startingX = startingX;
+        this.startingY = startingY;
+        this.startingHeading = startingHeading;
+
     }
     @Override
     public void init(HardwareMap hwMap) {
         pixelManipulator = new PixelManipulator();
-        drivebase = new Drivebase(new Pose2d(0, 0, 0)); // TODO: Set starting position
+        drivebase = new Drivebase(new Pose2d(startingX, startingY, startingHeading), new Position(startingX, startingY, startingHeading)); // TODO: Set starting position
         pal = new PAL();
 
         pixelManipulator.init(hwMap);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,23 +10,24 @@ import org.firstinspires.ftc.teamcode.util.Mechanism;
 
 public class Odometry extends Mechanism {
 
-    public DcMotorEx par0, par1, perp;
+    public DcMotor par0, par1, perp;
+
+    public Odometry(HardwareMap hwMap) {
+        par0 = hwMap.get(DcMotor.class, ConfigInfo.leftBack.getDeviceName());
+        par1 = hwMap.get(DcMotor.class, ConfigInfo.rightBack.getDeviceName());
+        perp = hwMap.get(DcMotor.class, ConfigInfo.leftFly.getDeviceName());
+
+        par0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        par1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        perp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
 
     @Override
     public void init(HardwareMap hwMap) {
-        par0 = hwMap.get(DcMotorEx.class, ConfigInfo.leftBack.getDeviceName());
-        par1 = hwMap.get(DcMotorEx.class, ConfigInfo.rightBack.getDeviceName());
-        perp = hwMap.get(DcMotorEx.class, ConfigInfo.leftFly.getDeviceName());
-
-        par1.setDirection(DcMotorEx.Direction.REVERSE);
-
-        par0.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        par1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        perp.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public double getParTicks() {
-        return (par0.getCurrentPosition() + par1.getCurrentPosition()) / 2.0;
+        return (par0.getCurrentPosition() + (-par1.getCurrentPosition())) / 2.0;
     }
 
     public double getPerpTicks() {
