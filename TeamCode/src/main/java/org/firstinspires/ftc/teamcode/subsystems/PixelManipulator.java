@@ -5,9 +5,11 @@ import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.HANGING_POS;
 import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.RESET_POS;
 import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.SAFE_EXTENSION_POS;
 import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.SAFE_RETRACTION_POS;
+import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.activeResetPos;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
@@ -19,6 +21,8 @@ public class PixelManipulator extends Mechanism {
     public Arm arm;
     public Claw claw;
     public PIDSlides slides;
+
+    double dropHeight = 0;
 
 
     enum ScoringState {
@@ -109,8 +113,15 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RELEASINGLEFT:
+                if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
+                    slides.setPower(gamepad2.left_stick_y);
+                } else {
+                    slides.holdPosition();
+                }
+
                 claw.releaseServo(claw.leftClamp);
                 if (claw.isLeftReleased && claw.isRightReleased) {
+                    dropHeight = slides.getLastPosition();
                     activeScoringState = ScoringState.RESETTING_STAGE_ONE;
                 }
                 if (gamepad2.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && isReleasable) {
@@ -119,8 +130,15 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RELEASINGRIGHT:
+                if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
+                    slides.setPower(gamepad2.left_stick_y);
+                } else {
+                    slides.holdPosition();
+                }
+
                 claw.releaseServo(claw.rightClamp);
                 if (claw.isLeftReleased && claw.isRightReleased) {
+                    dropHeight = slides.getLastPosition();
                     activeScoringState = ScoringState.RESETTING_STAGE_ONE;
                 }
                 if (gamepad2.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && isReleasable) {
@@ -129,7 +147,7 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RESETTING_STAGE_ONE:
-                slides.update(SAFE_RETRACTION_POS);
+                slides.update(Range.clip(dropHeight - 200, FULL_EXTENSION_POS, 0));
                 if (slides.isAtTargetPosition()) {
                     arm.retract();
                     claw.clampServo(claw.leftClamp);

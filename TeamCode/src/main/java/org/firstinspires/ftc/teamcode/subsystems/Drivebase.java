@@ -18,11 +18,11 @@ import org.firstinspires.ftc.vision.VisionPortal;
 public class Drivebase extends Mechanism {
 
     private static Pose2d STARTING_POS;
+    private static Position startingPosition;
 
-    private Camera camera;
+    public Camera camera;
     public MecanumDrive drive;
-    private IMU_Controller imu;
-    private Odometry odometry;
+    public AutoLocalizer localizer;
 
     private static final double DETECTION_ZONE = 24.0;
     private boolean isCameraControlling = false;
@@ -31,7 +31,7 @@ public class Drivebase extends Mechanism {
     // AUTO VARS
     //
 
-    private final double axialKp = 0.01; // TODO: Tune
+    private final double axialKp = 0.05; // TODO: Tune
     private final double axialKi = 0.0;
     private final double axialKd = 0.0;
     private final double axialIntegralSumMax = 0.0;
@@ -39,7 +39,7 @@ public class Drivebase extends Mechanism {
     private final double axialLowPassGain = 0.0;
 
 
-    private final double lateralKp = 0.01;
+    private final double lateralKp = 0.05;
     private final double lateralKi = 0.0;
     private final double lateralKd = 0.0;
     private final double lateralIntegralSumMax = 0.0;
@@ -47,7 +47,7 @@ public class Drivebase extends Mechanism {
     private final double lateralLowPassGain = 0.0;
 
 
-    private double headingKp = 0.01;
+    private double headingKp = 0.05;
     private double headingKi = 0.0;
     private final double headingKd = 0.0;
     private final double headingIntegralSumMax = 0.0;
@@ -58,19 +58,20 @@ public class Drivebase extends Mechanism {
     private PIDEx lateralPID = new PIDEx(new PIDCoefficientsEx(lateralKp, lateralKi, lateralKd, lateralIntegralSumMax, lateralStabilityThreshold, lateralLowPassGain));
     private PIDEx headingPID = new PIDEx(new PIDCoefficientsEx(headingKp, headingKi, headingKd, headingIntegralSumMax, headingStabilityThreshold, headingLowPassGain));
 
-    public Drivebase(Pose2d startingPose) {
+    private static final double XY_CLOSE_THRESHOLD = 0.1;
+    private static final double HEADING_CLOSE_THRESHOLD = 0.5;
+
+    public Drivebase(Pose2d startingPose, Position startingPosition) {
         STARTING_POS = startingPose;
+        this.startingPosition = startingPosition;
     }
 
     @Override
     public void init(HardwareMap hwMap) {
+        localizer = new AutoLocalizer(1000, 1000, startingPosition, hwMap);
         drive = new MecanumDrive(hwMap, STARTING_POS);
         camera = new Camera(true);
-        imu = new IMU_Controller();
-        odometry = new Odometry();
         camera.init(hwMap);
-        imu.init(hwMap);
-        odometry.init(hwMap);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class Drivebase extends Mechanism {
     }
 
     public double getDistanceToAprilControlZone(double distance) {
-        final double APRIL_CONTROL_ZONE_DIST = 8.0;
+        final double APRIL_CONTROL_ZONE_DIST = 4.0;
         return (distance - APRIL_CONTROL_ZONE_DIST);
     }
 
@@ -189,10 +190,17 @@ public class Drivebase extends Mechanism {
     // AUTO METHODS
     //
 
-    public void driveTo(double x, double y, double heading) {
-//        while () // TODO: Distance greater than certain amount or custom timeout specified
-        drive.setDrivePowers(inputToPoseVel(axialPID.calculate(x, x),
-                lateralPID.calculate(y, y),
-                headingPID.calculate(heading, heading)));
+    public void driveTo(double targetX, double targetY, double targetHeading) {
+        while (!isAtPosition(targetX, targetY, targetHeading)) { // TODO: Distance greater than certain amount or custom timeout specified
+            localizer.calculateCurrentPose();
+            drive.setDrivePowers(inputToPoseVel(
+                    axialPID.calculate(targetX, localizer.getCurrentPosition().getX()),
+                    lateralPID.calculate(targetY, localizer.getCurrentPosition().getY()),
+                    headingPID.calculate(targetHeading, localizer.getCurrentPosition().getHeading())));
+        } // Target, current
+    }
+
+    public boolean isAtPosition(double targetX, double targetY, double targetHeading) {
+        return (localizer.getCurrentPosition().getX() - targetX) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getY() - targetY) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getHeading() - targetHeading) < HEADING_CLOSE_THRESHOLD;
     }
 }

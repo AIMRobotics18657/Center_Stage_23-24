@@ -35,8 +35,8 @@ public class PAL extends Mechanism {
 
     @Override
     public void loop(Gamepad gamepad) {
-        leftFly.setPower(gamepad.right_trigger);
-        rightFly.setPower(gamepad.right_trigger);
+        leftFly.setPower(gamepad.left_trigger);
+        rightFly.setPower(gamepad.left_trigger);
         if (gamepad.dpad_up) {
             releaseServo.setPosition(RELEASE_POSITION);
         }

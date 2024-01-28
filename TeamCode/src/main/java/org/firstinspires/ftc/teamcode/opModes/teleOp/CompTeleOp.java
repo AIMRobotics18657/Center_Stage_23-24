@@ -12,7 +12,7 @@ public class CompTeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot = new Robot(true);
+        robot = new Robot(true, 0, 0, 0);
         robot.init(hardwareMap);
     }
 
