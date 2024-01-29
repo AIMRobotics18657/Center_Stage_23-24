@@ -67,7 +67,7 @@ public class PixelManipulator extends Mechanism {
         switch (activeScoringState) {
             case PICKING_UP:
                 slides.update(slides.getActiveResetPos());
-                if (gamepad2.y) {
+                if (gamepad2.y || gamepad.a) {
                     claw.outtake();
                 } else {
                     claw.intake();
@@ -78,13 +78,12 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case PIXELSLOADED_ONE:
-                if (gamepad2.y) {
+                if (gamepad2.y || gamepad.a) {
                     claw.outtake();
                 }
                 slides.update(SAFE_EXTENSION_POS);
                 if (slides.isAtTargetPosition()) {
                     arm.extend();
-                    claw.stopIntake();
                     setActiveScoringState(ScoringState.POSITIONING);
                 }
                 break;
@@ -106,8 +105,10 @@ public class PixelManipulator extends Mechanism {
                 }
 
                 if (gamepad2.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && isReleasable) {
+                    claw.stopIntake();
                     setActiveScoringState(ScoringState.RELEASINGLEFT);
                 } else if (gamepad2.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && isReleasable) {
+                    claw.stopIntake();
                     setActiveScoringState(ScoringState.RELEASINGRIGHT);
                 }
                 break;
@@ -147,7 +148,7 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RESETTING_STAGE_ONE:
-                slides.update(Range.clip(dropHeight - 200, FULL_EXTENSION_POS, 0));
+                slides.update(Range.clip(dropHeight - 300, FULL_EXTENSION_POS, 0));
                 if (slides.isAtTargetPosition()) {
                     arm.retract();
                     claw.clampServo(claw.leftClamp);
@@ -170,15 +171,18 @@ public class PixelManipulator extends Mechanism {
             case FULL_MANUAL:
                 if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
                     slides.setPower(gamepad2.left_stick_y);
-                } else if (gamepad2.a) {
-                    slides.update(SAFE_RETRACTION_POS);
-                } else if (gamepad2.b) {
-                    slides.update(SAFE_EXTENSION_POS);
-                } else if (gamepad2.y) {
-                    slides.update(slides.getActiveResetPos());
                 } else {
-                    slides.holdPosition();
+                    slides.setPower(0);
                 }
+//                else if (gamepad2.a) {
+//                    slides.update(SAFE_RETRACTION_POS);
+//                } else if (gamepad2.b) {
+//                    slides.update(SAFE_EXTENSION_POS);
+//                } else if (gamepad2.y) {
+//                    slides.update(slides.getActiveResetPos());
+//                } else {
+//                    slides.holdPosition();
+//                }
 
                 if (gamepad2.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
                     claw.intake();
@@ -203,6 +207,11 @@ public class PixelManipulator extends Mechanism {
                 } else if (gamepad2.dpad_left) {
                     slides.update(HANGING_POS);
                 }
+//                if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
+//                    slides.setPower(gamepad2.left_stick_y);
+//                } else {
+//                    slides.setPower(0);
+//                }
 
         }
     }

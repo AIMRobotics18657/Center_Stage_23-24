@@ -17,7 +17,7 @@ public class PAL extends Mechanism {
     private DcMotorEx rightFly;
     private Servo releaseServo;
 
-    private static final double RELEASE_POSITION = 0;
+    private static final double RELEASE_POSITION = 0.08;
     private static final double RETRACT_POSITION = 0.18;
     @Override
     public void init(HardwareMap hwMap) {
