@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name = "RedDrop", group = "AAAAA")
-public final class RedDrop extends LinearOpMode {
+@Autonomous(name = "StraightDrop", group = "AAAAA", preselectTeleOp="CompTeleOp")
+public final class StraightDrop extends LinearOpMode {
     Robot robot = new Robot(true, 0, 0, 0);
 
     @Override
@@ -19,8 +19,8 @@ public final class RedDrop extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            robot.drivebase.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(.5, .5), 0));
-            sleep(1800);
+            robot.drivebase.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(.5, 0), 0));
+            sleep(1400);
             robot.drivebase.drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
             sleep(1000);
 

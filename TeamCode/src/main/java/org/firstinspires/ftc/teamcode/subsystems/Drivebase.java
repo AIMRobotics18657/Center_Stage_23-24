@@ -22,7 +22,7 @@ public class Drivebase extends Mechanism {
 
     public Camera camera;
     public MecanumDrive drive;
-    public AutoLocalizer localizer;
+//    public AutoLocalizer localizer;
 
     private static final double DETECTION_ZONE = 24.0;
     private boolean isCameraControlling = false;
@@ -68,7 +68,7 @@ public class Drivebase extends Mechanism {
 
     @Override
     public void init(HardwareMap hwMap) {
-        localizer = new AutoLocalizer(1000, 1000, startingPosition, hwMap);
+//        localizer = new AutoLocalizer(1000, 1000, startingPosition, hwMap);
         drive = new MecanumDrive(hwMap, STARTING_POS);
         camera = new Camera(true);
         camera.init(hwMap);
@@ -179,7 +179,7 @@ public class Drivebase extends Mechanism {
 
     @Override
     public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
-        drive.setDrivePowers(inputToPoseVel(gamepad.left_stick_y, gamepad.left_stick_x, gamepad.right_stick_x));
+        drive.setDrivePowers(inputToPoseVel(-gamepad.left_stick_y, -gamepad.left_stick_x, -gamepad.right_stick_x));
         telemetry.addData("Pose Data", camera.getDesiredTagPoseData());
         telemetry.addData("Target Found", camera.targetFound);
         telemetry.addData("Current Detections", camera.getDetections());
@@ -190,17 +190,17 @@ public class Drivebase extends Mechanism {
     // AUTO METHODS
     //
 
-    public void driveTo(double targetX, double targetY, double targetHeading) {
-        while (!isAtPosition(targetX, targetY, targetHeading)) { // TODO: Distance greater than certain amount or custom timeout specified
-            localizer.calculateCurrentPose();
-            drive.setDrivePowers(inputToPoseVel(
-                    axialPID.calculate(targetX, localizer.getCurrentPosition().getX()),
-                    lateralPID.calculate(targetY, localizer.getCurrentPosition().getY()),
-                    headingPID.calculate(targetHeading, localizer.getCurrentPosition().getHeading())));
-        } // Target, current
-    }
-
-    public boolean isAtPosition(double targetX, double targetY, double targetHeading) {
-        return (localizer.getCurrentPosition().getX() - targetX) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getY() - targetY) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getHeading() - targetHeading) < HEADING_CLOSE_THRESHOLD;
-    }
+//    public void driveTo(double targetX, double targetY, double targetHeading) {
+//        while (!isAtPosition(targetX, targetY, targetHeading)) { // TODO: Distance greater than certain amount or custom timeout specified
+//            localizer.calculateCurrentPose();
+//            drive.setDrivePowers(inputToPoseVel(
+//                    axialPID.calculate(targetX, localizer.getCurrentPosition().getX()),
+//                    lateralPID.calculate(targetY, localizer.getCurrentPosition().getY()),
+//                    headingPID.calculate(targetHeading, localizer.getCurrentPosition().getHeading())));
+//        } // Target, current
+//    }
+//
+//    public boolean isAtPosition(double targetX, double targetY, double targetHeading) {
+//        return (localizer.getCurrentPosition().getX() - targetX) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getY() - targetY) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getHeading() - targetHeading) < HEADING_CLOSE_THRESHOLD;
+//    }
 }
