@@ -293,7 +293,7 @@ public class Camera extends Mechanism {
      * Telemetry on TensorFlow Object Detection
      * @param telemetry references local telemetry
      */
-    private void telemetryTfod(Telemetry telemetry) {
+    public void telemetryTfod(Telemetry telemetry) {
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
@@ -318,7 +318,7 @@ public class Camera extends Mechanism {
     public int getTfodElementPos() {
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         for (Recognition recognition : currentRecognitions) {
-            if (recognition.getLabel().equals(LABELS[0])) { // TODO Update for detections
+            if (recognition.getLabel().equals(LABELS[0]) || recognition.getLabel().equals(LABELS[9]) || recognition.getLabel().equals(LABELS[45])) { // TODO Update for detections
                 double x = (recognition.getLeft() + recognition.getRight()) / 2;
                 double y = (recognition.getTop() + recognition.getBottom()) / 2;
                 if (x < LEFT_MAX_THRESHOLD) {
