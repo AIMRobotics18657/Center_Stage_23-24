@@ -1,38 +1,28 @@
 package org.firstinspires.ftc.teamcode.opModes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
+import org.firstinspires.ftc.teamcode.subsystems.Camera;
 
 @Autonomous(name="CameraTest", group="Tests")
-public class CameraTestTeleOp extends Autonomous {
+public class CameraTestAutoOp extends LinearOpMode {
 
     Robot robot;
 
-
     @Override
-    public void init() {
-        robot = new Robot(true);
+    public void runOpMode() {
+        robot = new Robot(true, 0, 0, 0);
         robot.init(hardwareMap);
-    }
 
-    public void start() {
-        robot.start();
-    }
+        waitForStart();
 
-    @Override
-    public void loop() {
-        robot.loop(gamepad1, gamepad2);
-        telemetry.addData("Camera State", robot.drivebase.getGameRandomization());
+        while(opModeIsActive());
+            robot.drivebase.camera.telemetryTfod(telemetry);
+            telemetry.addData("Game Randomization", robot.drivebase.getGameRandomization());
 
-
-        // Display camera-related telemetry
-//        telemetry.addData("Camera State", robot.getCameraState());
-//        telemetry.addData("Number of Detections", robot.getDetections().size());
-
-        // Update telemetry
-        telemetry.update();
+            telemetry.update();
     }
 }
