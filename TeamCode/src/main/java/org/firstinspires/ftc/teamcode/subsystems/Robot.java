@@ -36,7 +36,7 @@ public class Robot extends Mechanism {
     @Override
     public void init(HardwareMap hwMap) {
         pixelManipulator = new PixelManipulator();
-        drivebase = new Drivebase(new Pose2d(startingX, startingY, startingHeading), new Position(startingX, startingY, startingHeading)); // TODO: Set starting position
+        drivebase = new Drivebase(new Pose2d(startingX, startingY, startingHeading)); // TODO: Set starting position
         pal = new PAL();
 
         pixelManipulator.init(hwMap);

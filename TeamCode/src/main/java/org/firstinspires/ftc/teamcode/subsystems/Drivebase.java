@@ -18,57 +18,19 @@ import org.firstinspires.ftc.vision.VisionPortal;
 public class Drivebase extends Mechanism {
 
     private static Pose2d STARTING_POS;
-    private static Position startingPosition;
 
     public Camera camera;
     public MecanumDrive drive;
-//    public AutoLocalizer localizer;
 
     private static final double DETECTION_ZONE = 24.0;
     private boolean isCameraControlling = false;
 
-    //
-    // AUTO VARS
-    //
-
-    private final double axialKp = 0.05; // TODO: Tune
-    private final double axialKi = 0.0;
-    private final double axialKd = 0.0;
-    private final double axialIntegralSumMax = 0.0;
-    private final double axialStabilityThreshold = 0.0;
-    private final double axialLowPassGain = 0.0;
-
-
-    private final double lateralKp = 0.05;
-    private final double lateralKi = 0.0;
-    private final double lateralKd = 0.0;
-    private final double lateralIntegralSumMax = 0.0;
-    private final double lateralStabilityThreshold = 0.0;
-    private final double lateralLowPassGain = 0.0;
-
-
-    private double headingKp = 0.05;
-    private double headingKi = 0.0;
-    private final double headingKd = 0.0;
-    private final double headingIntegralSumMax = 0.0;
-    private final double headingStabilityThreshold = 0.0;
-    private final double headingLowPassGain = 0.0;
-
-    private PIDEx axialPID = new PIDEx(new PIDCoefficientsEx(axialKp, axialKi, axialKd, axialIntegralSumMax, axialStabilityThreshold, axialLowPassGain));
-    private PIDEx lateralPID = new PIDEx(new PIDCoefficientsEx(lateralKp, lateralKi, lateralKd, lateralIntegralSumMax, lateralStabilityThreshold, lateralLowPassGain));
-    private PIDEx headingPID = new PIDEx(new PIDCoefficientsEx(headingKp, headingKi, headingKd, headingIntegralSumMax, headingStabilityThreshold, headingLowPassGain));
-
-    private static final double XY_CLOSE_THRESHOLD = 0.1;
-    private static final double HEADING_CLOSE_THRESHOLD = 0.5;
-
-    public Drivebase(Pose2d startingPose, Position startingPosition) {
+    public Drivebase(Pose2d startingPose) {
         STARTING_POS = startingPose;
-        this.startingPosition = startingPosition;
     }
 
     @Override
     public void init(HardwareMap hwMap) {
-//        localizer = new AutoLocalizer(1000, 1000, startingPosition, hwMap);
         drive = new MecanumDrive(hwMap, STARTING_POS);
         camera = new Camera(true);
         camera.init(hwMap);
@@ -185,22 +147,4 @@ public class Drivebase extends Mechanism {
         telemetry.addData("Current Detections", camera.getDetections());
         telemetry.addData("isCameraControlling", isCameraControlling);
     }
-
-    //
-    // AUTO METHODS
-    //
-
-//    public void driveTo(double targetX, double targetY, double targetHeading) {
-//        while (!isAtPosition(targetX, targetY, targetHeading)) { // TODO: Distance greater than certain amount or custom timeout specified
-//            localizer.calculateCurrentPose();
-//            drive.setDrivePowers(inputToPoseVel(
-//                    axialPID.calculate(targetX, localizer.getCurrentPosition().getX()),
-//                    lateralPID.calculate(targetY, localizer.getCurrentPosition().getY()),
-//                    headingPID.calculate(targetHeading, localizer.getCurrentPosition().getHeading())));
-//        } // Target, current
-//    }
-//
-//    public boolean isAtPosition(double targetX, double targetY, double targetHeading) {
-//        return (localizer.getCurrentPosition().getX() - targetX) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getY() - targetY) < XY_CLOSE_THRESHOLD && (localizer.getCurrentPosition().getHeading() - targetHeading) < HEADING_CLOSE_THRESHOLD;
-//    }
 }

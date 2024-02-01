@@ -28,7 +28,7 @@ public class SystemsCheck extends OpMode {
         CONNECTION_CHECK,
         INDIVIDUAL_CHECK
     }
-    Drivebase drivebase = new Drivebase(new Pose2d(0, 0, 0), new Position(0, 0, 0));
+    Drivebase drivebase = new Drivebase(new Pose2d(0, 0, 0));
     Odometry odometry;
     Camera camera = new Camera(false);
     Claw claw = new Claw();

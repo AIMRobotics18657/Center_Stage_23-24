@@ -29,6 +29,8 @@ public class Claw extends Mechanism {
             leftClamp = hwMap.get(Servo.class, ConfigInfo.leftClamp.getDeviceName());
             rightClamp = hwMap.get(Servo.class, ConfigInfo.rightClamp.getDeviceName());
             leftClamp.setDirection(Servo.Direction.REVERSE);
+            clampServo(leftClamp);
+            clampServo(rightClamp);
         }
 
         @Override

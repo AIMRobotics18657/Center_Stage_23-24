@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import androidx.annotation.NonNull;
+
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.NoFeedback;
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.PIDEx;
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedforward.FeedforwardEx;
@@ -9,6 +11,8 @@ import com.ThermalEquilibrium.homeostasis.Filters.Estimators.RawValue;
 import com.ThermalEquilibrium.homeostasis.Parameters.FeedforwardCoefficientsEx;
 import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficientsEx;
 import com.ThermalEquilibrium.homeostasis.Systems.BasicSystem;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -25,7 +29,7 @@ import java.util.function.DoubleSupplier;
 
 
 public class PIDSlides extends Mechanism {
-    private static final double KP = 0.0005;
+    private static final double KP = 0.001;
     private static final double KI = 0.000008;
     private static final double KD = 0.0005;
     private static final double INTEGRAL_SUM_MAX = 0;
@@ -74,6 +78,7 @@ public class PIDSlides extends Mechanism {
     public static final int FULL_EXTENSION_POS = -2120;
 
     public static final int PURPLE_DROP_POS = -1000;
+    public static final int YELLOW_DROP_POS = -1200;
 
     public static int activeResetPos = SAFE_RESET_POS;
 
@@ -95,7 +100,7 @@ public class PIDSlides extends Mechanism {
         lowPassFilter = new LowPassEstimator(positionSupplier, FILTER_LOW_PASS_GAIN);
 
         basicSystem = new BasicSystem(noFilter, PIDController, noFeedforward);
-        encoderMotor = rightSlide;
+        encoderMotor = leftSlide;
     }
 
     @Override
@@ -189,6 +194,38 @@ public class PIDSlides extends Mechanism {
 
     public int getActiveResetPos() {
         return activeResetPos;
+    }
+
+    public class LiftExtend implements Action {
+        private boolean initialized = false;
+        private final double targetPos;
+
+        LiftExtend(double targetPos) {
+            this.targetPos = targetPos;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                if (targetPos < getSlidesPosition()) {
+                    setPower(0.5);
+                } else {
+                    setPower(-0.5);
+                }
+                initialized = true;
+            }
+
+            packet.put("Lift Position: ", getSlidesPosition());
+            if (!isAtTargetPosition()) {
+                return true;
+            } else {
+                setPower(0);
+                return false;
+            }
+        }
+    }
+    public Action liftExtend(double targetPos) {
+        return new LiftExtend(targetPos);
     }
 
     @Override

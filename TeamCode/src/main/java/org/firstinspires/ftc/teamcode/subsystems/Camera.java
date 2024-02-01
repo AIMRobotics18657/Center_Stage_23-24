@@ -134,7 +134,7 @@ public class Camera extends Mechanism {
     private static final int LEFT_MAX_THRESHOLD = 213;
     private static final int CENTER_MAX_THRESHOLD = 427;
 
-    private static final float MINIMUM_CONFIDENCE = 0.7f; // Minimum confidence for a detection to be considered valid
+    private static final float MINIMUM_CONFIDENCE = 0.4f; // Minimum confidence for a detection to be considered valid
 
     private boolean isCustomModel; // Whether or not to use the custom model
 
@@ -318,7 +318,7 @@ public class Camera extends Mechanism {
     public int getTfodElementPos() {
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         for (Recognition recognition : currentRecognitions) {
-            if (recognition.getLabel().equals(LABELS[0]) || recognition.getLabel().equals(LABELS[9]) || recognition.getLabel().equals(LABELS[45])) { // TODO Update for detections
+            if (recognition.getLabel().equals(LABELS[0]) || recognition.getLabel().equals(LABELS[10]) || recognition.getLabel().equals(LABELS[85])) { // TODO Update for detections
                 double x = (recognition.getLeft() + recognition.getRight()) / 2;
                 double y = (recognition.getTop() + recognition.getBottom()) / 2;
                 if (x < LEFT_MAX_THRESHOLD) {
@@ -330,7 +330,7 @@ public class Camera extends Mechanism {
                 }
             }
         }
-        return 1;
+        return 2;
     }
 
     @Override
