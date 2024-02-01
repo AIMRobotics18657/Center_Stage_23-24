@@ -19,10 +19,11 @@ public class CameraTestAutoOp extends LinearOpMode {
 
         waitForStart();
 
-        while(opModeIsActive());
+        while(opModeIsActive()) {
             robot.drivebase.camera.telemetryTfod(telemetry);
             telemetry.addData("Game Randomization", robot.drivebase.getGameRandomization());
 
             telemetry.update();
+        }
     }
 }

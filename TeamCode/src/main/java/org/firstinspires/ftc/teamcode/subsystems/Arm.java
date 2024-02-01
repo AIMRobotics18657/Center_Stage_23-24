@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.util.ServoUtil;
 public class Arm extends Mechanism {
     public Servo leftArm;
     public Servo rightArm;
+
+    private static final double AUTO_EXTENDED_POSITION = 0.74;
     private static final double EXTENDED_POSITION = 0.63;
     private static final double RETRACTED_POSITION = 1;
     private static final double FULL_RETRACTED = 0.97;
@@ -53,6 +55,11 @@ public class Arm extends Mechanism {
     public void retract() {
         leftArm.setPosition(activeRetractPos);
         rightArm.setPosition(activeRetractPos);
+    }
+
+    public void autoExtend() {
+        leftArm.setPosition(AUTO_EXTENDED_POSITION);
+        rightArm.setPosition(AUTO_EXTENDED_POSITION);
     }
 
     public void setSafeRetractPos() {
