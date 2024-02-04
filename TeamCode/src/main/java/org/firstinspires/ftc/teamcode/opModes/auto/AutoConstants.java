@@ -20,9 +20,10 @@ public class AutoConstants {
     public static final double RED_LEFT_RIGHT_PURPLE_Y = -30;
     public static final double RED_MIDDLE_PURPLE_Y = -24;
     public static final double BLUE_LEFT_RIGHT_PURPLE_Y = 30;
-    public static final double BLUE_MIDDLE_PURPLE_Y = 24;
+    public static final double BLUE_MIDDLE_PURPLE_Y = 26;
 
-    public static final double LEFT_RELEASE_PURPLE_X = MIDDLE_PURPLE_X + LEFT_PURPLE_X_OFFSET + RELEASE_OFFSET;
+    public static final double RED_LEFT_RELEASE_PURPLE_X = MIDDLE_PURPLE_X + LEFT_PURPLE_X_OFFSET + RELEASE_OFFSET;
+    public static final double BLUE_LEFT_RELEASE_PURPLE_X = MIDDLE_PURPLE_X + RIGHT_PURPLE_X_OFFSET + RELEASE_OFFSET;
     public static final double RED_LEFT_RELEASE_PURPLE_Y = RED_LEFT_RIGHT_PURPLE_Y;
     public static final double BLUE_LEFT_RELEASE_PURPLE_Y = BLUE_LEFT_RIGHT_PURPLE_Y;
 
@@ -30,7 +31,8 @@ public class AutoConstants {
     public static final double RED_MIDDLE_RELEASE_PURPLE_Y = RED_MIDDLE_PURPLE_Y;
     public static final double BLUE_MIDDLE_RELEASE_PURPLE_Y = BLUE_MIDDLE_PURPLE_Y;
 
-    public static final double RIGHT_RELEASE_PURPLE_X = MIDDLE_PURPLE_X + RIGHT_PURPLE_X_OFFSET + RELEASE_OFFSET;
+    public static final double RED_RIGHT_RELEASE_PURPLE_X = MIDDLE_PURPLE_X + RIGHT_PURPLE_X_OFFSET + RELEASE_OFFSET;
+    public static final double BLUE_RIGHT_RELEASE_PURPLE_X = MIDDLE_PURPLE_X + LEFT_PURPLE_X_OFFSET + RELEASE_OFFSET;
     public static final double RED_RIGHT_RELEASE_PURPLE_Y = RED_LEFT_RIGHT_PURPLE_Y;
     public static final double BLUE_RIGHT_RELEASE_PURPLE_Y = BLUE_LEFT_RIGHT_PURPLE_Y;
 
@@ -38,7 +40,7 @@ public class AutoConstants {
     public static final double RELEASE_PURPLE_TANGENT = Math.toRadians(90);
 
 
-    public static final double PIXEL_BOARD_X = 60;
+    public static final double PIXEL_BOARD_X = 62;
     public static final double PIXEL_BOARD_PREP_X = PIXEL_BOARD_X - RELEASE_OFFSET - 6;
     public static final double RED_PIXEL_BOARD_PREP_Y = -36;
     public static final double BLUE_PIXEL_BOARD_PREP_Y = 36;
@@ -47,8 +49,8 @@ public class AutoConstants {
     public static final double PIXEL_BOARD_DROP_YELLOW_X = PIXEL_BOARD_X - RELEASE_OFFSET;
     public static final double RED_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y = -36;
     public static final double BLUE_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y = 36;
-    public static final double PIXEL_BOARD_LEFT_DROP_YELLOW_Y_OFFSET = 7;
-    public static final double PIXEL_BOARD_RIGHT_DROP_YELLOW_Y_OFFSET = -7;
+    public static final double PIXEL_BOARD_LEFT_DROP_YELLOW_Y_OFFSET = 7.5;
+    public static final double PIXEL_BOARD_RIGHT_DROP_YELLOW_Y_OFFSET = -10;
     public static final double RED_PIXEL_BOARD_LEFT_DROP_YELLOW_Y = RED_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y + PIXEL_BOARD_LEFT_DROP_YELLOW_Y_OFFSET;
     public static final double RED_PIXEL_BOARD_RIGHT_DROP_YELLOW_Y = RED_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y + PIXEL_BOARD_RIGHT_DROP_YELLOW_Y_OFFSET;
     public static final double BLUE_PIXEL_BOARD_LEFT_DROP_YELLOW_Y = BLUE_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y + PIXEL_BOARD_LEFT_DROP_YELLOW_Y_OFFSET;
@@ -60,28 +62,38 @@ public class AutoConstants {
     public static final double BLUE_PARK_Y = 12;
     public static final double PARK_HEADING = Math.toRadians(180);
 
+    //
+    // CAM AUTO
+    //
+
     public static final double CAMERA_DROP_START_X = -36;
     public static final double CAMERA_DROP_RED_START_Y = -72 + LENGTH_OFFSET;
     public static final double CAMERA_DROP_BLUE_START_Y = 72 - LENGTH_OFFSET;
-    public static final double CAMERA_DROP_START_HEADING = Math.toRadians(90);
-    public static final double CAMERA_DROP_START_HEADING_BLUE = Math.toRadians(270);
+    public static final double CAMERA_DROP_RED_START_HEADING = Math.toRadians(90);
+    public static final double CAMERA_DROP_BLUE_START_HEADING = Math.toRadians(270);
 
-    public static final double CAMERA_DROP_RED_LEFT_RELEASE_PURPLE_X = -39;
+    public static final double CAMERA_DROP_RED_LEFT_RELEASE_PURPLE_X = -38;
     public static final double CAMERA_DROP_RED_MIDDLE_RELEASE_PURPLE_X = -36;
-    public static final double CAMERA_DROP_RED_RIGHT_RELEASE_PURPLE_X = -33;
-    public static final double CAMERA_DROP_RED_LEFT_RIGHT_RELEASE_PURPLE_Y = -38;
-    public static final double CAMERA_DROP_RED_MIDDLE_RELEASE_PURPLE_Y = -32;
+    public static final double CAMERA_DROP_RED_RIGHT_RELEASE_PURPLE_X = -34;
+    public static final double CAMERA_DROP_RED_LEFT_RIGHT_RELEASE_PURPLE_Y = -39;
+    public static final double CAMERA_DROP_RED_MIDDLE_RELEASE_PURPLE_Y = -37;
     public static final double CAMERA_DROP_RED_LEFT_RELEASE_PURPLE_HEADING = Math.toRadians(135);
     public static final double CAMERA_DROP_RED_MIDDLE_RELEASE_PURPLE_HEADING = Math.toRadians(90);
-    public static final double CAMERA_DROP_RED_RIGHT_RELEASE_PURPLE_HEADING = Math.toRadians(45);
+    public static final double CAMERA_DROP_RED_RIGHT_RELEASE_PURPLE_HEADING = Math.toRadians(25);
 
-    public static final double CAMERA_DROP_BLUE_LEFT_RELEASE_PURPLE_X = 33;
-    public static final double CAMERA_DROP_BLUE_MIDDLE_RELEASE_PURPLE_X = 36;
-    public static final double CAMERA_DROP_BLUE_RIGHT_RELEASE_PURPLE_X = 39;
-    public static final double CAMERA_DROP_BLUE_LEFT_RIGHT_RELEASE_PURPLE_Y = 38;
-    public static final double CAMERA_DROP_BLUE_MIDDLE_RELEASE_PURPLE_Y = 32;
-    public static final double CAMERA_DROP_BLUE_LEFT_RELEASE_PURPLE_HEADING = Math.toRadians(315);
+    public static final double CAMERA_DROP_RED_PARK_X = -36;
+    public static final double CAMERA_DROP_RED_PARK_Y = -44;
+
+    public static final double CAMERA_DROP_BLUE_LEFT_RELEASE_PURPLE_X = -34;
+    public static final double CAMERA_DROP_BLUE_MIDDLE_RELEASE_PURPLE_X = -36;
+    public static final double CAMERA_DROP_BLUE_RIGHT_RELEASE_PURPLE_X = -38;
+    public static final double CAMERA_DROP_BLUE_LEFT_RIGHT_RELEASE_PURPLE_Y = 35.5;
+    public static final double CAMERA_DROP_BLUE_MIDDLE_RELEASE_PURPLE_Y = 35.5;
+    public static final double CAMERA_DROP_BLUE_LEFT_RELEASE_PURPLE_HEADING = Math.toRadians(335);
     public static final double CAMERA_DROP_BLUE_MIDDLE_RELEASE_PURPLE_HEADING = Math.toRadians(270);
     public static final double CAMERA_DROP_BLUE_RIGHT_RELEASE_PURPLE_HEADING = Math.toRadians(225);
+
+    public static final double CAMERA_DROP_BLUE_PARK_X = -36;
+    public static final double CAMERA_DROP_BLUE_PARK_Y = 44;
 
 }
