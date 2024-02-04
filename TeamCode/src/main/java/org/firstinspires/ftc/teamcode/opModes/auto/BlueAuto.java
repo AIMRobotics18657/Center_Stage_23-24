@@ -11,13 +11,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name = "BlueAuto", group = "Tests")
+@Autonomous(name = "BlueAuto", group = "Tests", preselectTeleOp="CompTeleOp")
 public final class BlueAuto extends LinearOpMode {
     Robot robot = new Robot(true, AutoConstants.START_X, AutoConstants.BLUE_START_Y, AutoConstants.BLUE_START_HEADING);
     int randomization = 1;
 
     private static final int sleepInSeconds = 1;
-    private static final double slideSleepInSeconds = 1.4;
+    private static final double slideSleepInSeconds = 1.3;
 
     Pose2d lastPurpleDropPose = new Pose2d(0, 0, 0);
     Pose2d lastYellowDropPose = new Pose2d(0, 0, 0);
@@ -32,9 +32,9 @@ public final class BlueAuto extends LinearOpMode {
             randomization = robot.drivebase.getGameRandomization();
             Action driveToPurpleDrop;
             if (randomization == 1) {
-                lastPurpleDropPose = new Pose2d(AutoConstants.LEFT_RELEASE_PURPLE_X, AutoConstants.BLUE_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
+                lastPurpleDropPose = new Pose2d(AutoConstants.BLUE_LEFT_RELEASE_PURPLE_X, AutoConstants.BLUE_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToSplineHeading(new Pose2d(AutoConstants.LEFT_RELEASE_PURPLE_X, AutoConstants.BLUE_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
+                        .splineToSplineHeading(new Pose2d(AutoConstants.BLUE_LEFT_RELEASE_PURPLE_X, AutoConstants.BLUE_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
                         .build();
             } else if (randomization == 2) {
                 lastPurpleDropPose = new Pose2d(AutoConstants.MIDDLE_RELEASE_PURPLE_X, AutoConstants.BLUE_MIDDLE_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
@@ -42,9 +42,9 @@ public final class BlueAuto extends LinearOpMode {
                         .splineToSplineHeading(new Pose2d(AutoConstants.MIDDLE_RELEASE_PURPLE_X, AutoConstants.BLUE_MIDDLE_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
                         .build();
             } else {
-                lastPurpleDropPose = new Pose2d(AutoConstants.RIGHT_RELEASE_PURPLE_X, AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
+                lastPurpleDropPose = new Pose2d(AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_X, AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToSplineHeading(new Pose2d(AutoConstants.RIGHT_RELEASE_PURPLE_X, AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
+                        .splineToSplineHeading(new Pose2d(AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_X, AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
                         .build();
             }
 
@@ -77,13 +77,13 @@ public final class BlueAuto extends LinearOpMode {
             //DRIVE TO DROP PIXEL
             Actions.runBlocking(
                     new SequentialAction(
+                            driveToPurpleDrop,
                             (telemetryPacket) -> { // Extend Arm
                                 robot.pixelManipulator.arm.autoExtend();
                                 telemetryPacket.addLine("Extending Arm");
                                 return false;
                             },
                             new SleepAction(sleepInSeconds),
-                            driveToPurpleDrop,
                             (telemetryPacket) -> { // Drop Purple
                                 robot.pixelManipulator.claw.releaseServo(robot.pixelManipulator.claw.leftClamp);
                                 return false;
@@ -106,6 +106,7 @@ public final class BlueAuto extends LinearOpMode {
                                 return false;
                             },
                             new SleepAction(sleepInSeconds),
+                            driveToPark,
                             (telemetryPacket) -> { // Retract Arm
                                 robot.pixelManipulator.arm.retract();
                                 robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.leftClamp);
@@ -113,7 +114,6 @@ public final class BlueAuto extends LinearOpMode {
                                 return robot.pixelManipulator.arm.isRetracted;
                             },
                             new SleepAction(sleepInSeconds),
-                            driveToPark,
                             (telemetryPacket) -> { // Retract Slides
                                 robot.pixelManipulator.slides.setPower(0.3);
                                 return false;
