@@ -18,8 +18,8 @@ public class Minibots extends OpMode {
         rightMotor = hardwareMap.dcMotor.get("right");  // Replace "right_motor" with the actual name in your robot configuration
 
         // Set motor directions
-        leftMotor.setDirection(DcMotor.Direction.REVERSE); // TODO Adjust if needed
-        rightMotor.setDirection(DcMotor.Direction.REVERSE); // TODO Adjust if needed
+        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override

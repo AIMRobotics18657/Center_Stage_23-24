@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.auto;
+package org.firstinspires.ftc.teamcode.opModes.auto.superquals;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -9,11 +9,12 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.opModes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name = "BlueAuto", group = "Tests", preselectTeleOp="CompTeleOp")
-public final class BlueAuto extends LinearOpMode {
-    Robot robot = new Robot(true, AutoConstants.START_X, AutoConstants.BLUE_START_Y, AutoConstants.BLUE_START_HEADING);
+@Autonomous(name = "RedAuto", group = "Tests", preselectTeleOp="CompTeleOp")
+public final class RedAuto extends LinearOpMode {
+    Robot robot = new Robot(true, AutoConstants.START_X, AutoConstants.RED_START_Y, AutoConstants.RED_START_HEADING);
     int randomization = 1;
 
     private static final int sleepInSeconds = 1;
@@ -32,46 +33,46 @@ public final class BlueAuto extends LinearOpMode {
             randomization = robot.drivebase.getGameRandomization();
             Action driveToPurpleDrop;
             if (randomization == 1) {
-                lastPurpleDropPose = new Pose2d(AutoConstants.BLUE_LEFT_RELEASE_PURPLE_X, AutoConstants.BLUE_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
+                lastPurpleDropPose = new Pose2d(AutoConstants.RED_LEFT_RELEASE_PURPLE_X, AutoConstants.RED_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToSplineHeading(new Pose2d(AutoConstants.BLUE_LEFT_RELEASE_PURPLE_X, AutoConstants.BLUE_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
+                        .splineToSplineHeading(new Pose2d(AutoConstants.RED_LEFT_RELEASE_PURPLE_X, AutoConstants.RED_LEFT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
                         .build();
             } else if (randomization == 2) {
-                lastPurpleDropPose = new Pose2d(AutoConstants.MIDDLE_RELEASE_PURPLE_X, AutoConstants.BLUE_MIDDLE_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
+                lastPurpleDropPose = new Pose2d(AutoConstants.MIDDLE_RELEASE_PURPLE_X, AutoConstants.RED_MIDDLE_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToSplineHeading(new Pose2d(AutoConstants.MIDDLE_RELEASE_PURPLE_X, AutoConstants.BLUE_MIDDLE_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
+                        .splineToSplineHeading(new Pose2d(AutoConstants.MIDDLE_RELEASE_PURPLE_X, AutoConstants.RED_MIDDLE_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
                         .build();
             } else {
-                lastPurpleDropPose = new Pose2d(AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_X, AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
+                lastPurpleDropPose = new Pose2d(AutoConstants.RED_RIGHT_RELEASE_PURPLE_X, AutoConstants.RED_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING);
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToSplineHeading(new Pose2d(AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_X, AutoConstants.BLUE_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
+                        .splineToSplineHeading(new Pose2d(AutoConstants.RED_RIGHT_RELEASE_PURPLE_X, AutoConstants.RED_RIGHT_RELEASE_PURPLE_Y, AutoConstants.RELEASE_PURPLE_HEADING), AutoConstants.RELEASE_PURPLE_TANGENT)
                         .build();
             }
 
             Action driveToPixelBoard = robot.drivebase.drive.actionBuilder(lastPurpleDropPose)
-                    .strafeToLinearHeading(new Vector2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.BLUE_PIXEL_BOARD_PREP_Y), AutoConstants.PIXEL_BOARD_PREP_HEADING)
+                    .strafeToLinearHeading(new Vector2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.RED_PIXEL_BOARD_PREP_Y), AutoConstants.PIXEL_BOARD_PREP_HEADING)
                     .build();
 
             Action driveToYellowDrop;
             if (randomization == 1) {
-                lastYellowDropPose = new Pose2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.BLUE_PIXEL_BOARD_LEFT_DROP_YELLOW_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING);
-                driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.BLUE_PIXEL_BOARD_PREP_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING))
-                        .strafeTo(new Vector2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.BLUE_PIXEL_BOARD_LEFT_DROP_YELLOW_Y))
+                lastYellowDropPose = new Pose2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.RED_PIXEL_BOARD_LEFT_DROP_YELLOW_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING);
+                driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.RED_PIXEL_BOARD_PREP_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING))
+                        .strafeTo(new Vector2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.RED_PIXEL_BOARD_LEFT_DROP_YELLOW_Y))
                         .build();
             } else if (randomization == 2) {
-                lastYellowDropPose = new Pose2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.BLUE_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING);
-                driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.BLUE_PIXEL_BOARD_PREP_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING))
-                        .strafeTo(new Vector2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.BLUE_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y))
+                lastYellowDropPose = new Pose2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.RED_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING);
+                driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.RED_PIXEL_BOARD_PREP_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING))
+                        .strafeTo(new Vector2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.RED_PIXEL_BOARD_MIDDLE_DROP_YELLOW_Y))
                         .build();
             } else {
-                lastYellowDropPose = new Pose2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.BLUE_PIXEL_BOARD_RIGHT_DROP_YELLOW_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING);
-                driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.BLUE_PIXEL_BOARD_PREP_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING))
-                        .strafeTo(new Vector2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.BLUE_PIXEL_BOARD_RIGHT_DROP_YELLOW_Y))
+                lastYellowDropPose = new Pose2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.RED_PIXEL_BOARD_RIGHT_DROP_YELLOW_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING);
+                driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(AutoConstants.PIXEL_BOARD_PREP_X, AutoConstants.RED_PIXEL_BOARD_PREP_Y, AutoConstants.PIXEL_BOARD_PREP_HEADING))
+                        .strafeTo(new Vector2d(AutoConstants.PIXEL_BOARD_DROP_YELLOW_X, AutoConstants.RED_PIXEL_BOARD_RIGHT_DROP_YELLOW_Y))
                         .build();
             }
 
             Action driveToPark = robot.drivebase.drive.actionBuilder(lastYellowDropPose)
-                    .strafeToLinearHeading(new Vector2d(AutoConstants.PARK_X, AutoConstants.BLUE_PARK_Y), AutoConstants.PARK_HEADING)
+                    .strafeToLinearHeading(new Vector2d(AutoConstants.PARK_X, AutoConstants.RED_PARK_Y), AutoConstants.PARK_HEADING)
                     .build();
 
             //DRIVE TO DROP PIXEL

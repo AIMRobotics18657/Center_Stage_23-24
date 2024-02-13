@@ -13,6 +13,7 @@ public class Robot extends Mechanism {
 
     public PixelManipulator pixelManipulator;
     public Drivebase drivebase;
+    private Hubs hubs;
     MatchTimer timer = new MatchTimer();
 
     PAL pal;
@@ -36,12 +37,14 @@ public class Robot extends Mechanism {
     @Override
     public void init(HardwareMap hwMap) {
         pixelManipulator = new PixelManipulator();
-        drivebase = new Drivebase(new Pose2d(startingX, startingY, startingHeading)); // TODO: Set starting position
+        drivebase = new Drivebase(new Pose2d(startingX, startingY, startingHeading));
         pal = new PAL();
+        hubs = new Hubs();
 
         pixelManipulator.init(hwMap);
         drivebase.init(hwMap);
         pal.init(hwMap);
+        hubs.init(hwMap);
         timer.init(hwMap);
     }
 
@@ -52,17 +55,15 @@ public class Robot extends Mechanism {
         timer.loop(gamepad);
 
         isEndGame = timer.getTime() > ENDGAME_TIMESTAMP;
-        isDrivebaseSpeeding = drivebase.isDriveSpeeding();
+        isDrivebaseSpeeding = drivebase.isDriveSpeeding(gamepad);
         if (isEndGame) {
             pal.loop(gamepad);
             pixelManipulator.setHangModeEnabled(true);
         }
-        if (gamepad.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
+        if (gamepad.right_trigger > GamepadSettings.GP1_TRIGGER_DEADZONE || isDrivebaseSpeeding) {
             pixelManipulator.slides.setSafeResetPos();
-//            pixelManipulator.arm.setSafeRetractPos();
         } else {
             pixelManipulator.slides.setResetPos();
-//            pixelManipulator.arm.setRetractPos();
         }
     }
 
