@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.FULL_EXTENSION_POS;
 import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.HANGING_POS;
-import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.RESET_POS;
-import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.SAFE_EXTENSION_POS;
-import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.SAFE_RETRACTION_POS;
-import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.activeResetPos;
+import static org.firstinspires.ftc.teamcode.subsystems.PIDSlides.MIN_EXTENSION_POS;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,7 +11,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
-import org.opencv.core.Mat;
 
 public class PixelManipulator extends Mechanism {
 
@@ -22,11 +18,11 @@ public class PixelManipulator extends Mechanism {
     public Claw claw;
     public PIDSlides slides;
 
-    double dropHeight = 0;
+    double lastDropHeight = 0;
 
 
     enum ScoringState {
-        PICKING_UP, PIXELSLOADED_ONE, PIXELSLOADED_TWO, POSITIONING, RELEASINGLEFT, RELEASINGRIGHT, RESETTING_STAGE_ONE, RESETTING_STAGE_TWO, FULL_MANUAL, HANGING
+        PICKING_UP, PIXELSLOADED_ONE, POSITIONING, RELEASINGLEFT, RELEASINGRIGHT, RESETTING_STAGE_ONE, RESETTING_STAGE_TWO, FULL_MANUAL, HANGING
     }
 
     ScoringState activeScoringState = ScoringState.RESETTING_STAGE_TWO;
@@ -59,8 +55,7 @@ public class PixelManipulator extends Mechanism {
 
         if (manualOverride) {
             setActiveScoringState(ScoringState.FULL_MANUAL);
-        }
-        if (hangMode) { // && hangModeEnabled
+        } else if (hangMode) {
             setActiveScoringState(ScoringState.HANGING);
         }
 
@@ -78,24 +73,15 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case PIXELSLOADED_ONE:
-                if (gamepad2.y || gamepad.a) {
+                if (gamepad.a || gamepad2.y) {
                     claw.outtake();
                 }
-                slides.update(SAFE_EXTENSION_POS);
+                slides.update(Range.clip(lastDropHeight, FULL_EXTENSION_POS, MIN_EXTENSION_POS));
                 if (slides.isAtTargetPosition()) {
                     arm.extend();
                     setActiveScoringState(ScoringState.POSITIONING);
                 }
                 break;
-
-//            case PIXELSLOADED_TWO:
-//                arm.extend();
-//                if (arm.isExtended && gamepad2.a) {
-//                    claw.stopIntake();
-//                    setActiveScoringState(ScoringState.POSITIONING);
-//                }
-//                break;
-
 
             case POSITIONING:
                 if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
@@ -122,7 +108,7 @@ public class PixelManipulator extends Mechanism {
 
                 claw.releaseServo(claw.leftClamp);
                 if (claw.isLeftReleased && claw.isRightReleased) {
-                    dropHeight = slides.getLastPosition();
+                    lastDropHeight = slides.getLastPosition();
                     activeScoringState = ScoringState.RESETTING_STAGE_ONE;
                 }
                 if (gamepad2.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && isReleasable) {
@@ -139,7 +125,7 @@ public class PixelManipulator extends Mechanism {
 
                 claw.releaseServo(claw.rightClamp);
                 if (claw.isLeftReleased && claw.isRightReleased) {
-                    dropHeight = slides.getLastPosition();
+                    lastDropHeight = slides.getLastPosition();
                     activeScoringState = ScoringState.RESETTING_STAGE_ONE;
                 }
                 if (gamepad2.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && isReleasable) {
@@ -148,7 +134,7 @@ public class PixelManipulator extends Mechanism {
                 break;
 
             case RESETTING_STAGE_ONE:
-                slides.update(Range.clip(dropHeight - 300, FULL_EXTENSION_POS, 0));
+                slides.update(Range.clip(lastDropHeight - 300, FULL_EXTENSION_POS, 0));
                 if (slides.isAtTargetPosition()) {
                     arm.retract();
                     claw.clampServo(claw.leftClamp);
@@ -207,11 +193,11 @@ public class PixelManipulator extends Mechanism {
                 } else if (gamepad2.dpad_left) {
                     slides.update(HANGING_POS);
                 }
-//                if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
-//                    slides.setPower(gamepad2.left_stick_y);
-//                } else {
-//                    slides.setPower(0);
-//                }
+                if (Math.abs(gamepad2.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
+                    slides.setPower(gamepad2.left_stick_y);
+                } else {
+                    slides.holdPosition();
+                }
 
         }
     }

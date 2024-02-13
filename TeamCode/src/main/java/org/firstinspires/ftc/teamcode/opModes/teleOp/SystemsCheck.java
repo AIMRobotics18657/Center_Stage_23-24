@@ -76,7 +76,7 @@ public class SystemsCheck extends OpMode {
                 } else {
                     telemetry.addData("Stage 0: Connection Check", "Not all devices connected");
                     telemetry.addData("Bypass with lt and rt", "");
-                    if (gamepad1.left_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE && gamepad1.right_trigger > GamepadSettings.GP2_TRIGGER_DEADZONE) {
+                    if (gamepad1.left_trigger > GamepadSettings.GP1_TRIGGER_DEADZONE && gamepad1.right_trigger > GamepadSettings.GP1_TRIGGER_DEADZONE) {
                         currentStage = SystemCheckStage.INDIVIDUAL_CHECK; // Transition to next stage
                     }
                 }

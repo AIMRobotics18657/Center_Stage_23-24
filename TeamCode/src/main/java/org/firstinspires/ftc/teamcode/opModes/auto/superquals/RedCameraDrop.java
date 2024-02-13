@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.auto;
+package org.firstinspires.ftc.teamcode.opModes.auto.superquals;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.opModes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Autonomous(name = "RedCameraDrop", group = "Tests", preselectTeleOp="CompTeleOp")

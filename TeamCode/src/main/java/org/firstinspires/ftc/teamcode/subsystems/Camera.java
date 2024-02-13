@@ -21,23 +21,13 @@ import java.util.concurrent.TimeUnit;
 public class Camera extends Mechanism {
     private static VisionPortal visionPortal; // Used to manage the video source.
     private static AprilTagProcessor aprilTag; // Used for managing the AprilTag detection process
-    private static AprilTagDetection desiredTag = null; // Used to hold the data for a detected AprilTag
-    boolean targetFound = false; // Is the target tag currently detected?
+    private static AprilTagDetection detectedTag = null; // Used to hold the data for a detected AprilTag
     static final int exposureMS = 4; // ms exposure
     static final int gain = 250; // gain
 
-    // Tag IDs
-    public static final int BLUE_LEFT_ID = 1;
-    public static final int BLUE_CENTER_ID = 2;
-    public static final int BLUE_RIGHT_ID = 3;
-    public static final int RED_LEFT_ID = 4;
-    public static final int RED_CENTER_ID = 5;
-    public static final int RED_RIGHT_ID = 6;
-
+    private static final int DESIRED_TAG_ID = -1; // The ID of the desired tag (-1 is all tags)
     private static TfodProcessor tfod; // Used for managing the TensorFlow Object detection process
-
     private static final String TFOD_MODEL_ASSET = "ssd_mobilenet_v2_320x320_coco17_tpu_8.tflite"; // Name of the model asset
-
     private static final String[] LABELS = { // Labels for the model
             "person",
             "bicycle",
@@ -205,35 +195,22 @@ public class Camera extends Mechanism {
 
     /**
      * Checks to see if the desired tag is detected and sets the targetFound variable and metadata accordingly
-     * @param desiredTagID the ID of the desired tag
      */
-    public void checkAndSetDesiredTag(int desiredTagID) {
+    public void checkDetections() {
         List<AprilTagDetection> currentDetections = getDetections();
         boolean detectionFound = false; // Add this variable
-
+        detectedTag = null;
         for (AprilTagDetection detection : currentDetections) {
             // Look to see if we have size info on this tag.
             if (detection.metadata != null) {
                 // Check to see if we want to track towards this tag.
-                if ((desiredTagID < 0) || (detection.id == desiredTagID)) {
+                if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
                     // Yes, we want to use this tag.
-                    targetFound = true;
-                    desiredTag = detection;
+                    detectedTag = detection;
                     detectionFound = true; // Set detectionFound to true
                     break;  // don't look any further.
-                } else {
-                    // This tag is in the library, but we do not want to track it right now.
-                    // You can remove this line, as it's not necessary.
                 }
-            } else {
-                // This tag is NOT in the library, so we don't have enough information to track to it.
-                // You can remove this line, as it's not necessary.
             }
-        }
-
-        // After the loop, set targetFound based on detectionFound
-        if (!detectionFound) {
-            targetFound = false;
         }
     }
 
@@ -242,8 +219,8 @@ public class Camera extends Mechanism {
      * @return pose data of the desired tag
      */
     public double[] getDesiredTagPoseData() {
-        if (targetFound) {
-            return new double[] {desiredTag.ftcPose.range, desiredTag.ftcPose.bearing, desiredTag.ftcPose.yaw};
+        if (detectedTag != null) { // detectedTag is not null
+            return new double[] {detectedTag.ftcPose.range, detectedTag.ftcPose.bearing, detectedTag.ftcPose.yaw};
         } else {
             return null;
         }
@@ -271,18 +248,18 @@ public class Camera extends Mechanism {
      */
     private void telemetryTag(Telemetry telemetry) {
         if (visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) { // Check if the camera is streaming
-            if (targetFound) {
-                telemetry.addData("Tag ID ", desiredTag.id);
-                telemetry.addData("Tag Name ", desiredTag.metadata.name);
-                telemetry.addData("Tag X ", desiredTag.ftcPose.x);
-                telemetry.addData("Tag Y ", desiredTag.ftcPose.y);
-                telemetry.addData("Tag Z ", desiredTag.ftcPose.z);
-                telemetry.addData("Tag Pitch ", desiredTag.ftcPose.pitch);
-                telemetry.addData("Tag Roll ", desiredTag.ftcPose.roll);
-                telemetry.addData("Tag Yaw ", desiredTag.ftcPose.yaw);
-                telemetry.addData("Tag Range ", desiredTag.ftcPose.range);
-                telemetry.addData("Tag Bearing ", desiredTag.ftcPose.bearing);
-                telemetry.addData("Tag Elevation ", desiredTag.ftcPose.elevation);
+            if (detectedTag != null) {
+                telemetry.addData("Tag ID ", detectedTag.id);
+                telemetry.addData("Tag Name ", detectedTag.metadata.name);
+                telemetry.addData("Tag X ", detectedTag.ftcPose.x);
+                telemetry.addData("Tag Y ", detectedTag.ftcPose.y);
+                telemetry.addData("Tag Z ", detectedTag.ftcPose.z);
+                telemetry.addData("Tag Pitch ", detectedTag.ftcPose.pitch);
+                telemetry.addData("Tag Roll ", detectedTag.ftcPose.roll);
+                telemetry.addData("Tag Yaw ", detectedTag.ftcPose.yaw);
+                telemetry.addData("Tag Range ", detectedTag.ftcPose.range);
+                telemetry.addData("Tag Bearing ", detectedTag.ftcPose.bearing);
+                telemetry.addData("Tag Elevation ", detectedTag.ftcPose.elevation);
             } else {
                 telemetry.addLine("No TAG");
             }
@@ -335,7 +312,7 @@ public class Camera extends Mechanism {
 
     @Override
     public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
-        checkAndSetDesiredTag(-1);
+        checkDetections();
         telemetryTag(telemetry);
         getTfodElementPos();
         telemetryTfod(telemetry);

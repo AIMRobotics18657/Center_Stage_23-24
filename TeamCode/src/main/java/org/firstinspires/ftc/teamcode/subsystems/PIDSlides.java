@@ -70,16 +70,11 @@ public class PIDSlides extends Mechanism {
     public static final double PROXIMITY_THRESHOLD = 10;
 
     public static final int RESET_POS = 0;
-
-    public static final int SAFE_EXTENSION_POS = -1000;
-    public static final int SAFE_RETRACTION_POS = -1200;
     public static final int SAFE_RESET_POS = -125;
+
+    public static final int MIN_EXTENSION_POS = -800;
     public static final int HANGING_POS = -425;
     public static final int FULL_EXTENSION_POS = -2120;
-
-    public static final int PURPLE_DROP_POS = -1000;
-    public static final int YELLOW_DROP_POS = -1200;
-
     public static int activeResetPos = SAFE_RESET_POS;
 
     @Override
@@ -196,46 +191,14 @@ public class PIDSlides extends Mechanism {
         return activeResetPos;
     }
 
-    public class LiftExtend implements Action {
-        private boolean initialized = false;
-        private final double targetPos;
-
-        LiftExtend(double targetPos) {
-            this.targetPos = targetPos;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            if (!initialized) {
-                if (targetPos < getSlidesPosition()) {
-                    setPower(0.5);
-                } else {
-                    setPower(-0.5);
-                }
-                initialized = true;
-            }
-
-            packet.put("Lift Position: ", getSlidesPosition());
-            if (!isAtTargetPosition()) {
-                return true;
-            } else {
-                setPower(0);
-                return false;
-            }
-        }
-    }
-    public Action liftExtend(double targetPos) {
-        return new LiftExtend(targetPos);
-    }
-
     @Override
     public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
         if (Math.abs(gamepad.left_stick_y) > GamepadSettings.GP2_STICK_DEADZONE) {
             setPower(gamepad.left_stick_y);
         } else if (gamepad.a) {
-            update(SAFE_RETRACTION_POS);
+            update(FULL_EXTENSION_POS);
         } else if (gamepad.b) {
-            update(SAFE_EXTENSION_POS);
+            update(SAFE_RESET_POS);
         } else if (gamepad.y) {
             update(RESET_POS);
         } else {
