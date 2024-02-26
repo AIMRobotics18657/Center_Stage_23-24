@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
@@ -29,12 +30,12 @@ import java.util.function.DoubleSupplier;
 
 
 public class PIDSlides extends Mechanism {
-    private static final double KP = 0.001;
+    private static final double KP = 0.005;
     private static final double KI = 0.00001;
-    private static final double KD = 0.0005;
-    private static final double INTEGRAL_SUM_MAX = 0;
-    private static final double STABILITY_THRESHOLD = 0;
-    private static final double LOW_PASS_GAIN = 0;
+    private static final double KD = 0.0008;
+    private static final double INTEGRAL_SUM_MAX = 2500;
+    private static final double STABILITY_THRESHOLD = 0.8;
+    private static final double LOW_PASS_GAIN = 0.8;
 
     private static final double KV = 0;
     private static final double KA = 0;
@@ -70,11 +71,11 @@ public class PIDSlides extends Mechanism {
     public static final double PROXIMITY_THRESHOLD = 10;
 
     public static final int RESET_POS = 0;
-    public static final int SAFE_RESET_POS = -125;
+    public static final int SAFE_RESET_POS = -25;
 
-    public static final int MIN_EXTENSION_POS = -800;
+    public static final int MIN_EXTENSION_POS = -630;
     public static final int HANGING_POS = -425;
-    public static final int FULL_EXTENSION_POS = -2120;
+    public static final int FULL_EXTENSION_POS = -2170;
     public static int activeResetPos = SAFE_RESET_POS;
 
     @Override
@@ -84,7 +85,7 @@ public class PIDSlides extends Mechanism {
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
 
         pidCoefficientsEx = new PIDCoefficientsEx(KP, KI, KD, INTEGRAL_SUM_MAX, STABILITY_THRESHOLD, LOW_PASS_GAIN);
         PIDController = new PIDEx(pidCoefficientsEx);
@@ -96,6 +97,7 @@ public class PIDSlides extends Mechanism {
 
         basicSystem = new BasicSystem(noFilter, PIDController, noFeedforward);
         encoderMotor = leftSlide;
+        setSlidesCurrentAlert(6000);
     }
 
     @Override
@@ -106,6 +108,10 @@ public class PIDSlides extends Mechanism {
 
     @Override
     public void telemetry(Telemetry telemetry) {
+        telemetry.addData("leftSlideCurrent (miliamps)", leftSlide.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("rightSlideCurrent (miliamps)", rightSlide.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("leftSlideCurrentAlert", leftSlide.getCurrentAlert(CurrentUnit.MILLIAMPS));
+        telemetry.addData("rightSlideCurrentAlert", rightSlide.getCurrentAlert(CurrentUnit.MILLIAMPS));
         telemetry.addData("leftSlidePos", leftSlide.getCurrentPosition());
         telemetry.addData("rightSlidePos", rightSlide.getCurrentPosition());
         telemetry.addData("Target Position", targetPos);
@@ -163,6 +169,18 @@ public class PIDSlides extends Mechanism {
         return encoderMotor.getPower();
     }
 
+    public double getSlidesCurrent() {
+        return encoderMotor.getCurrent(CurrentUnit.MILLIAMPS);
+    }
+
+    public boolean isSlidesOverCurrent() {
+        return encoderMotor.isOverCurrent();
+    }
+
+    public void setSlidesCurrentAlert(double current) {
+        encoderMotor.setCurrentAlert(current, CurrentUnit.MILLIAMPS);
+    }
+
     public void setLastPosition() {
         lastEncoderMotorPos = encoderMotor.getCurrentPosition();
     }
@@ -204,6 +222,10 @@ public class PIDSlides extends Mechanism {
         } else {
             holdPosition();
         }
+        telemetry.addData("leftSlideCurrent (miliamps)", leftSlide.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("rightSlideCurrent (miliamps)", rightSlide.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetry.addData("leftSlideCurrentAlert", leftSlide.getCurrentAlert(CurrentUnit.MILLIAMPS));
+        telemetry.addData("rightSlideCurrentAlert", rightSlide.getCurrentAlert(CurrentUnit.MILLIAMPS));
         telemetry.addData("leftSlidePos", leftSlide.getCurrentPosition());
         telemetry.addData("rightSlidePos", rightSlide.getCurrentPosition());
         telemetry.addData("Target Position", targetPos);

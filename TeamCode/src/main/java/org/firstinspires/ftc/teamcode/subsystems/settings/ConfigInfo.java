@@ -9,7 +9,7 @@ public class ConfigInfo {
     public static HardwareInterface rightArm = new HardwareInterface("RA", false, 0);
 
     // CLAW
-    public static HardwareInterface intake = new HardwareInterface("SS", true, 2);
+    public static HardwareInterface intake = new HardwareInterface("SS", true, 3);
     public static HardwareInterface leftClamp = new HardwareInterface("LC", true, 1);
     public static HardwareInterface rightClamp = new HardwareInterface("RC", false, 1);
 
@@ -20,8 +20,6 @@ public class ConfigInfo {
     public static HardwareInterface rightBack = new HardwareInterface("BRD", false, 0);
 
     // PAL
-    public static HardwareInterface leftFly = new HardwareInterface("PAL", true, 3);
-    public static HardwareInterface rightFly = new HardwareInterface("PAR", false, 3);
     public static HardwareInterface releaseServo = new HardwareInterface("REL", false, 2);
 
     // SLIDES
@@ -45,8 +43,6 @@ public class ConfigInfo {
             rightFront.getDeviceName(),
             leftBack.getDeviceName(),
             rightBack.getDeviceName(),
-            leftFly.getDeviceName(),
-            rightFly.getDeviceName(),
             releaseServo.getDeviceName(),
             leftSlide.getDeviceName(),
             rightSlide.getDeviceName(),

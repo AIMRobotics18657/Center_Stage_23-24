@@ -17,25 +17,31 @@ public class IMU_Controller extends Mechanism {
             RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
     private IMU imu;
 
-        public IMU_Controller(HardwareMap hwMap) {
-            imu = hwMap.get(IMU.class, ConfigInfo.imu.getDeviceName());
-            imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
-                    logoFacingDirection, usbFacingDirection))
-            );
+    public IMU_Controller(HardwareMap hwMap, boolean resetYAW) {
+        imu = hwMap.get(IMU.class, ConfigInfo.imu.getDeviceName());
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
+                logoFacingDirection, usbFacingDirection))
+        );
+        if (resetYAW) {
             imu.resetYaw();
         }
+    }
 
-        @Override
-        public void init(HardwareMap hwMap) {
+    @Override
+    public void init(HardwareMap hwMap) {
 
-        }
+    }
 
-        @Override
-        public void loop(Gamepad gamepad) {
+    @Override
+    public void loop(Gamepad gamepad) {
 
-        }
+    }
 
-        public double getHeading() {
-            return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        }
+    public double getHeading() {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
+    public double getHeadingError(double targetHeading) {
+        return targetHeading - getHeading();
+    }
 }

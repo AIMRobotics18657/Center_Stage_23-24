@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.sun.tools.javac.tree.DCTree;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
@@ -12,10 +15,10 @@ import org.firstinspires.ftc.teamcode.util.ServoUtil;
 
 public class Claw extends Mechanism {
 
-        public CRServo spinningIntake;
+        public DcMotorEx spinningIntake;
         public Servo leftClamp;
         public Servo rightClamp;
-        private static final double RELEASE_POSITION = 0.86;
+        private static final double RELEASE_POSITION = 0.845;
         private static final double GATE_POSITION = 1;
 
         public boolean isLeftClamped = false;
@@ -25,9 +28,11 @@ public class Claw extends Mechanism {
 
         @Override
         public void init(HardwareMap hwMap) {
-            spinningIntake = hwMap.get(CRServo.class, ConfigInfo.intake.getDeviceName());
+            spinningIntake = hwMap.get(DcMotorEx.class, ConfigInfo.intake.getDeviceName());
             leftClamp = hwMap.get(Servo.class, ConfigInfo.leftClamp.getDeviceName());
             rightClamp = hwMap.get(Servo.class, ConfigInfo.rightClamp.getDeviceName());
+
+            spinningIntake.setDirection(DcMotorSimple.Direction.REVERSE);
             leftClamp.setDirection(Servo.Direction.REVERSE);
             clampServo(leftClamp);
             clampServo(rightClamp);
@@ -61,11 +66,11 @@ public class Claw extends Mechanism {
         }
 
         public void intake() {
-            spinningIntake.setPower(1);
+            spinningIntake.setPower(0.6);
         }
 
         public void outtake() {
-            spinningIntake.setPower(-1);
+            spinningIntake.setPower(-0.35);
         }
 
         public void stopIntake() {
@@ -83,18 +88,17 @@ public class Claw extends Mechanism {
             } else if (gamepad.y) {
                 releaseServo(rightClamp);
             } else if (gamepad.dpad_up) {
-                ServoUtil.increment(leftClamp, rightClamp, 0.01);
+                ServoUtil.increment(leftClamp, rightClamp, 0.005);
             } else if (gamepad.dpad_down) {
-                ServoUtil.increment(leftClamp, rightClamp, -0.01);
+                ServoUtil.increment(leftClamp, rightClamp, -0.005);
             }
 
-            if (gamepad.left_bumper) {
-                intake();
-            } else if (gamepad.right_bumper) {
-                outtake();
-            } else {
-                stopIntake();
+            if (gamepad.left_trigger > 0.01){
+                spinningIntake.setPower(gamepad.left_trigger);
+            } else if (gamepad.right_trigger > 0.01){
+                spinningIntake.setPower(-gamepad.right_trigger);
             }
+
 
             telemetry.addData("Left Prong Position", leftClamp.getPosition());
             telemetry.addData("Right Prong Position", rightClamp.getPosition());

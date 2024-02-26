@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes.auto;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -14,7 +15,7 @@ public class CameraTestAutoOp extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Robot(true, 0, 0, 0);
+        robot = new Robot(true, new Pose2d(0, 0, 0), true);
         robot.init(hardwareMap);
 
         waitForStart();
