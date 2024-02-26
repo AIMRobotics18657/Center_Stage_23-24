@@ -9,12 +9,11 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.opModes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Autonomous(name = "RedCameraDrop", group = "Tests", preselectTeleOp="CompTeleOp")
 public final class RedCameraDrop extends LinearOpMode {
-    Robot robot = new Robot(true, AutoConstants.CAMERA_DROP_START_X, AutoConstants.CAMERA_DROP_RED_START_Y, AutoConstants.CAMERA_DROP_RED_START_HEADING);
+    Robot robot = new Robot(true, new Pose2d(AutoConstants.CAMERA_DROP_START_X, AutoConstants.CAMERA_DROP_RED_START_Y, AutoConstants.CAMERA_DROP_RED_START_HEADING), true);
     int randomization = 1;
     Pose2d lastPurpleDropPose = new Pose2d(0, 0, 0);
 

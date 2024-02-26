@@ -9,12 +9,11 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.opModes.auto.AutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Autonomous(name = "BlueAuto", group = "Tests", preselectTeleOp="CompTeleOp")
 public final class BlueAuto extends LinearOpMode {
-    Robot robot = new Robot(true, AutoConstants.START_X, AutoConstants.BLUE_START_Y, AutoConstants.BLUE_START_HEADING);
+    Robot robot = new Robot(true, new Pose2d(AutoConstants.START_X, AutoConstants.BLUE_START_Y, AutoConstants.BLUE_START_HEADING), true);
     int randomization = 1;
 
     private static final int sleepInSeconds = 1;

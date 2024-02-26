@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.subsystems.Camera;
@@ -13,7 +12,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivebase;
 import org.firstinspires.ftc.teamcode.subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.subsystems.PAL;
 import org.firstinspires.ftc.teamcode.subsystems.PIDSlides;
-import org.firstinspires.ftc.teamcode.subsystems.Position;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 
@@ -28,7 +26,7 @@ public class SystemsCheck extends OpMode {
         CONNECTION_CHECK,
         INDIVIDUAL_CHECK
     }
-    Drivebase drivebase = new Drivebase(new Pose2d(0, 0, 0));
+    Drivebase drivebase = new Drivebase(true, new Pose2d(0, 0, 0), true);
     Odometry odometry;
     Camera camera = new Camera(false);
     Claw claw = new Claw();

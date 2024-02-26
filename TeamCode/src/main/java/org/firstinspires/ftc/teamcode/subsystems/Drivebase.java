@@ -16,9 +16,13 @@ import org.firstinspires.ftc.vision.VisionPortal;
 public class Drivebase extends Mechanism {
 
     private static Pose2d STARTING_POS; // Starting position of the robot
+    private final boolean resetIMU; // If the IMU should be reset
+    private final boolean isRedAlliance; // If the robot is on the red alliance
 
     public Camera camera; // Camera object
     public MecanumDrive drive; // MecanumDrive object
+    private IMU_Controller imu; // IMU object
+    private double targetHeading; // Target heading for the robot
 
     private static final double AT_READ_MAX = 24.0; // Max distance to read AprilTags
     private boolean isSlowModeEnabled = false; // If the robot is in slow mode (Reduced strafe and forward speed. Slowed turn speed unless read by AT)
@@ -27,8 +31,10 @@ public class Drivebase extends Mechanism {
      * Constructor for Drivebase
      * @param startingPose Starting position of the robot
      */
-    public Drivebase(Pose2d startingPose) {
+    public Drivebase(boolean isRedAlliance, Pose2d startingPose, boolean resetIMU) {
+        this.isRedAlliance = isRedAlliance;
         STARTING_POS = startingPose;
+        this.resetIMU = resetIMU;
     }
 
     /**
@@ -39,7 +45,14 @@ public class Drivebase extends Mechanism {
     public void init(HardwareMap hwMap) {
         drive = new MecanumDrive(hwMap, STARTING_POS);
         camera = new Camera(true);
+        imu = new IMU_Controller(hwMap, resetIMU);
         camera.init(hwMap);
+        imu.init(hwMap);
+        if (isRedAlliance) {
+            targetHeading = -90;
+        } else {
+            targetHeading = 90;
+        }
     }
 
     /**
@@ -58,7 +71,7 @@ public class Drivebase extends Mechanism {
     @Override
     public void telemetry(Telemetry telemetry) {
         camera.telemetry(telemetry);
-        telemetry.addData("DrivebaseSpeeding", isDriveSpeeding());
+        telemetry.addData("DrivebaseSpeeding", isDriveSpeeding(new Gamepad()));
         telemetry.addData("Slow Mode Enabled", isSlowModeEnabled);
         telemetry.addData("Pose Data", camera.getDesiredTagPoseData());
         telemetry.addData("Current Detections", camera.getDetections());
@@ -69,7 +82,7 @@ public class Drivebase extends Mechanism {
      * @param gamepad references gamepad in slot one
      */
     public void drive(Gamepad gamepad) {
-        isSlowModeEnabled = gamepad.x; // TODO: Change to a different button
+        isSlowModeEnabled = gamepad.right_trigger > GamepadSettings.GP1_TRIGGER_DEADZONE; // TODO: Change to a different button
         if (isSlowModeEnabled) {
             if (camera.getCameraState() == VisionPortal.CameraState.STREAMING) {
                 camera.checkDetections();
@@ -105,16 +118,19 @@ public class Drivebase extends Mechanism {
      * @return PoseVelocity2d pose velocity to be used by the drivebase
      */
     public PoseVelocity2d clampSpeedsToPoseVelocity(double y, double x, double rx) {
-        final double YAW_KP = 0.05; // TODO: Tune this
-        final double MAX_AUTO_TURN = 0.8; // TODO: Tune this
-        double turn = poweredInput(stickValWithDeadzone(rx) * GamepadSettings.VRX_WEIGHT_SLOW); // Set to slow mode turn speed
-        double[] poseData = camera.getDesiredTagPoseData();
-        if (poseData != null) { // If there is a tag detected
-            if (poseData[0] <= AT_READ_MAX) { // If the tag is close enough to read
-                double headingError = poseData[2]; // Get the heading error
-                turn = Range.clip(headingError * YAW_KP, -MAX_AUTO_TURN, MAX_AUTO_TURN); // Set the turn speed proportional to the error
-            }
-        }
+        final double YAW_KP = 0.016; // TODO: Tune this
+        final double MAX_AUTO_TURN = 0.5; // TODO: Tune this
+//        double turn = poweredInput(stickValWithDeadzone(rx) * GamepadSettings.VRX_WEIGHT_SLOW); // Set to slow mode turn speed
+//        double[] poseData = camera.getDesiredTagPoseData();
+//        if (poseData != null) { // If there is a tag detected
+//            if (poseData[0] <= AT_READ_MAX) { // If the tag is close enough to read
+//                double headingError = poseData[2]; // Get the heading error
+//                turn = Range.clip(headingError * YAW_KP, -MAX_AUTO_TURN, MAX_AUTO_TURN); // Set the turn speed proportional to the error
+//            }
+//        }
+        double headingError = imu.getHeadingError(targetHeading); // Get the heading error
+        double turn = Range.clip(headingError * YAW_KP, -MAX_AUTO_TURN, MAX_AUTO_TURN) + poweredInput(stickValWithDeadzone(rx) * GamepadSettings.VRX_WEIGHT_SLOW); // Set the turn speed proportional to the error
+
         return new PoseVelocity2d( // Return the new pose velocity
                 new Vector2d(
                         poweredInput(stickValWithDeadzone(y) * GamepadSettings.VY_WEIGHT_SLOW),
@@ -163,7 +179,7 @@ public class Drivebase extends Mechanism {
      * @return if the drivebase is speeding
      */
     public boolean isDriveSpeeding(Gamepad gamepad) {
-        final double SPEEDING_CONST = 0.2;
+        final double SPEEDING_CONST = 0.9;
         return Math.abs(gamepad.left_stick_y) > SPEEDING_CONST ||
                 Math.abs(gamepad.left_stick_x) > SPEEDING_CONST ||
                 Math.abs(gamepad.right_stick_x) > SPEEDING_CONST;

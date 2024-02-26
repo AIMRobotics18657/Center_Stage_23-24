@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes.auto;
+package org.firstinspires.ftc.teamcode.opModes.auto.superquals;
 
 public class AutoConstants {
 
