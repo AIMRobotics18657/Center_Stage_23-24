@@ -44,7 +44,7 @@ public class Drivebase extends Mechanism {
     @Override
     public void init(HardwareMap hwMap) {
         drive = new MecanumDrive(hwMap, STARTING_POS);
-        camera = new Camera(true);
+        camera = new Camera(true, isRedAlliance);
         imu = new IMU_Controller(hwMap, resetIMU);
         camera.init(hwMap);
         imu.init(hwMap);
