@@ -18,6 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -136,6 +137,8 @@ public class Camera extends Mechanism {
 
     private boolean isCustomModel; // Whether or not to use the custom model
 
+    private WebcamName webcamName;
+
     /**
      * Constructor for Camera
      * @param isCustomModel whether or not to use the custom model
@@ -152,12 +155,19 @@ public class Camera extends Mechanism {
     @Override
     public void init(HardwareMap hwMap) {
         int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
-        openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, ConfigInfo.camera.getDeviceName()), cameraMonitorViewId);
+        webcamName = hwMap.get(WebcamName.class, ConfigInfo.camera.getDeviceName());
+        openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+        openCam();
+//        initAT();
+//        initTFOD();
+//        initVisionPortal(hwMap);
+    }
+
+    public void openCam() {
         openCvCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                openCvCamera.startStreaming(640, 480);
-                FtcDashboard.getInstance().startCameraStream(openCvCamera, 0);
+                openCvCamera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
                 openCvCamera.setPipeline(pipeline);
             }
 
@@ -166,9 +176,6 @@ public class Camera extends Mechanism {
 
             }
         });
-        initAT();
-        initTFOD();
-        initVisionPortal(hwMap);
     }
 
     public void initAT() {
@@ -191,7 +198,7 @@ public class Camera extends Mechanism {
     }
 
     public void initVisionPortal(HardwareMap hwMap) {
-        setManualExposure(exposureMS, gain);
+//        setManualExposure(exposureMS, gain);
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, ConfigInfo.camera.getDeviceName()))
                 .addProcessor(aprilTag)

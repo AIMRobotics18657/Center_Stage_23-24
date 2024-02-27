@@ -13,9 +13,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.PIDSlides;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name = "FarRed", group = "AAA_COMP", preselectTeleOp="CompTeleOp")
-public final class FarRed extends LinearOpMode {
-    Robot robot = new Robot(true, FinalsAutoConstants.START_FAR_RED_POSE, true);
+@Autonomous(name = "FarBlue", group = "AAA_COMP", preselectTeleOp="CompTeleOp")
+public final class CloseBlue extends LinearOpMode {
+    Robot robot = new Robot(false, FinalsAutoConstants.START_NEAR_BLUE_POSE, true);
     int randomization;
 
     boolean isAtPixelPrep = true;
@@ -34,50 +34,47 @@ public final class FarRed extends LinearOpMode {
 
         robot.drivebase.camera.stopStreaming();
 
-        while (opModeIsActive() && !isStopRequested()) {
+        while (opModeIsActive()) {
             randomization = robot.drivebase.camera.whichRegion();
             Action driveToPurpleDrop;
 
             Pose2d purpleDropSpot;
             Vector2d yellowDropSpot;
-            if (randomization == 1) {
-                purpleDropSpot = FinalsAutoConstants.P_DROP_RED_1_A;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_1;
+            if (randomization == 3) {
+                purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_3_B_CLOSE;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_BLUE_3;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToConstantHeading(FinalsAutoConstants.P_DROP_RED_1_A.position, FinalsAutoConstants.P_DROP_RED_1_A_TANGENT)
+                        .strafeTo(FinalsAutoConstants.P_DROP_BLUE_3_A_CLOSE)
+                        .splineToSplineHeading(FinalsAutoConstants.P_DROP_BLUE_3_B_CLOSE, FinalsAutoConstants.P_DROP_BLUE_3_B_TANGENT_CLOSE)
                         .build();
             } else if (randomization == 2) {
-                purpleDropSpot = FinalsAutoConstants.P_DROP_RED_2_A;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_2;
+                purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_2_A_CLOSE;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_BLUE_2;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToConstantHeading(FinalsAutoConstants.P_DROP_RED_2_A.position, FinalsAutoConstants.P_DROP_RED_2_A_TANGENT)
+                        .splineToConstantHeading(FinalsAutoConstants.P_DROP_BLUE_2_A_CLOSE.position, FinalsAutoConstants.P_DROP_BLUE_2_A_TANGENT_CLOSE)
                         .build();
             } else {
-                purpleDropSpot = FinalsAutoConstants.P_DROP_RED_3_B;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_3;
+                purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_1_A_CLOSE;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_BLUE_1;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .strafeTo(FinalsAutoConstants.P_DROP_RED_3_A)
-                        .splineToSplineHeading(FinalsAutoConstants.P_DROP_RED_3_B, FinalsAutoConstants.P_DROP_RED_3_B_TANGENT)
+                        .splineToConstantHeading(FinalsAutoConstants.P_DROP_BLUE_1_A_CLOSE.position, FinalsAutoConstants.P_DROP_BLUE_1_A_TANGENT_CLOSE)
                         .build();
             }
 
             Action driveToPixelBoard = robot.drivebase.drive.actionBuilder(purpleDropSpot)
-                    .strafeTo(FinalsAutoConstants.TRUSS_PASS_RED_A)
-                    .strafeToSplineHeading(FinalsAutoConstants.TRUSS_PASS_RED_B.position, FinalsAutoConstants.TRUSS_PASS_RED_B.heading)
-                    .strafeTo(FinalsAutoConstants.SPLINE_PRE_RED)
-                    .splineToConstantHeading(FinalsAutoConstants.SPLINE_POST_RED, FinalsAutoConstants.SPLINE_POST_RED_TANGENT)
+                    .splineToSplineHeading(new Pose2d(FinalsAutoConstants.SPLINE_POST_BLUE, FinalsAutoConstants.PIXEL_BOARD_HEADING), FinalsAutoConstants.SPLINE_POST_BLUE_TANGENT)
                     .build();
 
-            Action driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(FinalsAutoConstants.SPLINE_POST_RED, FinalsAutoConstants.SPLINE_POST_RED_HEADING))
+            Action driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(FinalsAutoConstants.SPLINE_POST_BLUE, FinalsAutoConstants.PIXEL_BOARD_HEADING))
                     .strafeTo(yellowDropSpot)
                     .build();
 
-            Action driveToPark = robot.drivebase.drive.actionBuilder(new Pose2d(yellowDropSpot, FinalsAutoConstants.SPLINE_POST_RED_HEADING))
-                    .strafeTo(FinalsAutoConstants.SAFE_PARK_TRANSITION_RED)
-                    .strafeToLinearHeading(FinalsAutoConstants.PARK_RED.position, FinalsAutoConstants.PARK_RED.heading)
+            Action driveToPark = robot.drivebase.drive.actionBuilder(new Pose2d(yellowDropSpot, FinalsAutoConstants.PIXEL_BOARD_HEADING))
+                    .strafeTo(FinalsAutoConstants.SAFE_PARK_TRANSITION_BLUE)
+                    .strafeToLinearHeading(FinalsAutoConstants.PARK_BLUE.position, FinalsAutoConstants.PARK_BLUE.heading)
                     .build();
 
             //DRIVE TO DROP PIXEL
@@ -106,8 +103,8 @@ public final class FarRed extends LinearOpMode {
                                                 isAtPixelPrep = false;
                                                 return false;
                                             }
-                                        )
-                                    ),
+                                    )
+                            ),
                             new ParallelAction(
                                     (telemetryPacket) -> { // Lift Slides
                                         robot.pixelManipulator.slides.update(PIDSlides.MIN_EXTENSION_POS);

@@ -20,15 +20,15 @@ public class Pipeline extends OpenCvPipeline {
     Mat mat = new Mat();
     Scalar lowHSV;
     Scalar highHSV;
-    public static int rightRectX = 500;
-    public static int rightRectY = 80;
-    public static int leftRectX = 50;
-    public static int leftRectY = 80;
-    public static int centerRectX = 275;
-    public static int centerRectY = 50;
+    public static int rightRectX = 250;
+    public static int rightRectY = 40;
+    public static int leftRectX = 25;
+    public static int leftRectY = 40;
+    public static int centerRectX = 137;
+    public static int centerRectY = 25;
     Rect RIGHT_RECT, CENTER_RECT, LEFT_RECT;
     double rightRegionPercent, centerRegionPercent, leftRegionPercent;
-    int region;
+    int region = 2;
 
     public Pipeline() {
         this.isRedAlliance = true;
@@ -50,9 +50,9 @@ public class Pipeline extends OpenCvPipeline {
             highHSV = blueHighHSV;
         }
 
-        RIGHT_RECT = new Rect(rightRectX, rightRectY, 125, 125);
-        CENTER_RECT = new Rect(centerRectX, centerRectY, 125, 125);
-        LEFT_RECT = new Rect(leftRectX, leftRectY, 125, 125);
+        RIGHT_RECT = new Rect(rightRectX, rightRectY, 62, 62);
+        CENTER_RECT = new Rect(centerRectX, centerRectY, 62, 62);
+        LEFT_RECT = new Rect(leftRectX, leftRectY, 62, 62);
 
         Core.inRange(mat, lowHSV, highHSV, mat);
 
@@ -71,8 +71,8 @@ public class Pipeline extends OpenCvPipeline {
         Imgproc.rectangle(mat, CENTER_RECT, new Scalar(60, 255, 255), 5);
 
         Imgproc.putText(mat, "Left: " + String.format("%.4f", leftRegionPercent), new org.opencv.core.Point(0, 25), 0, 1, new Scalar(180, 255, 255), 2);
-        Imgproc.putText(mat, "Center: " + String.format("%.4f", centerRegionPercent), new org.opencv.core.Point(213, 25), 0, 1, new Scalar(180, 255, 255), 2);
-        Imgproc.putText(mat, "Right: " + String.format("%.4f", rightRegionPercent), new org.opencv.core.Point(427, 25), 0, 1, new Scalar(180, 255, 255), 2);
+        Imgproc.putText(mat, "Center: " + String.format("%.4f", centerRegionPercent), new org.opencv.core.Point(106, 25), 0, 1, new Scalar(180, 255, 255), 2);
+        Imgproc.putText(mat, "Right: " + String.format("%.4f", rightRegionPercent), new org.opencv.core.Point(213, 25), 0, 1, new Scalar(180, 255, 255), 2);
 
         if (leftRegionPercent > tolerance && leftRegionPercent > centerRegionPercent && leftRegionPercent > rightRegionPercent) {
             Imgproc.rectangle(mat, LEFT_RECT, new Scalar(180, 255, 255), 10);

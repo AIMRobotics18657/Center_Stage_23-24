@@ -15,19 +15,18 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Autonomous(name = "FarBlue", group = "AAA_COMP", preselectTeleOp="CompTeleOp")
 public final class FarBlue extends LinearOpMode {
-    Robot robot = new Robot(true, FinalsAutoConstants.START_FAR_BLUE_POSE, true);
+    Robot robot = new Robot(false, FinalsAutoConstants.START_FAR_BLUE_POSE, true);
     int randomization;
 
-    boolean isAtPixelPrep = false;
-    boolean hasPixelDropped = false;
-    boolean isAtPark = false;
+    boolean isAtPixelPrep = true;
+    boolean hasPixelDropped = true;
+    boolean isAtPark = true;
 
     @Override
     public void runOpMode() {
 
         robot.init(hardwareMap);
 
-        waitForStart();
         while (!isStarted() && !isStopRequested()) {
             telemetry.addData("REGION: ", robot.drivebase.camera.whichRegion());
             telemetry.update();
@@ -50,11 +49,11 @@ public final class FarBlue extends LinearOpMode {
                         .splineToSplineHeading(FinalsAutoConstants.P_DROP_BLUE_1_B, FinalsAutoConstants.P_DROP_BLUE_1_B_TANGENT)
                         .build();
             } else if (randomization == 2) {
-                purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_2_B;
+                purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_2_A;
                 yellowDropSpot = FinalsAutoConstants.Y_DROP_BLUE_2;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
-                        .splineToConstantHeading(FinalsAutoConstants.P_DROP_BLUE_2_B.position, FinalsAutoConstants.P_DROP_BLUE_2_B_TANGENT)
+                        .splineToConstantHeading(FinalsAutoConstants.P_DROP_BLUE_2_A.position, FinalsAutoConstants.P_DROP_BLUE_2_A_TANGENT)
                         .build();
             } else {
                 purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_3_A;
@@ -104,7 +103,7 @@ public final class FarBlue extends LinearOpMode {
                                             },
                                             driveToPixelBoard,
                                             (telemetryPacket) -> { // End parallel action
-                                                isAtPixelPrep = true;
+                                                isAtPixelPrep = false;
                                                 return false;
                                             }
                                     )
@@ -114,11 +113,12 @@ public final class FarBlue extends LinearOpMode {
                                         robot.pixelManipulator.slides.update(PIDSlides.MIN_EXTENSION_POS);
                                         return hasPixelDropped;
                                     },
-                                    (telemetryPacket) -> { // Extend Arm
-                                        robot.pixelManipulator.arm.autoExtend();
-                                        return false;
-                                    },
                                     new SequentialAction(
+                                            (telemetryPacket) -> { // Extend Arm
+                                                robot.pixelManipulator.arm.autoExtend();
+                                                return false;
+                                            },
+                                            new SleepAction(1.0),
                                             driveToYellowDrop,
                                             (telemetryPacket) -> { // Drop Yellow
                                                 robot.pixelManipulator.claw.releaseServo(robot.pixelManipulator.claw.rightClamp);
@@ -126,7 +126,7 @@ public final class FarBlue extends LinearOpMode {
                                             },
                                             new SleepAction(1.0),
                                             (telemetryPacket) -> { // End parallel action
-                                                hasPixelDropped = true;
+                                                hasPixelDropped = false;
                                                 return false;
                                             }
                                     )
@@ -147,7 +147,7 @@ public final class FarBlue extends LinearOpMode {
                                             new SequentialAction(
                                                     driveToPark,
                                                     (telemetryPacket) -> { // End Auto
-                                                        isAtPark = true;
+                                                        isAtPark = false;
                                                         return false;
                                                     }
                                             )
