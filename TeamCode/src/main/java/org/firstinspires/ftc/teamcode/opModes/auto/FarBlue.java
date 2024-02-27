@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.subsystems.PIDSlides;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Autonomous(name = "FarBlue", group = "AAA_COMP", preselectTeleOp="CompTeleOp")
@@ -17,8 +18,9 @@ public final class FarBlue extends LinearOpMode {
     Robot robot = new Robot(true, FinalsAutoConstants.START_FAR_BLUE_POSE, true);
     int randomization;
 
-    private static final int sleepInSeconds = 1;
-    private static final double slideSleepInSeconds = 1.3;
+    boolean isAtPixelPrep = false;
+    boolean hasPixelDropped = false;
+    boolean isAtPark = false;
 
     @Override
     public void runOpMode() {
@@ -26,20 +28,22 @@ public final class FarBlue extends LinearOpMode {
         robot.init(hardwareMap);
 
         waitForStart();
-        while (opModeInInit()) {
-            telemetry.addData("Randomization", robot.drivebase.getGameRandomization());
+        while (!isStarted() && !isStopRequested()) {
+            telemetry.addData("REGION: ", robot.drivebase.camera.whichRegion());
             telemetry.update();
         }
+
+        robot.drivebase.camera.stopStreaming();
+
         while (opModeIsActive()) {
-//            randomization = robot.drivebase.getGameRandomization();
-            randomization = 3;
+            randomization = robot.drivebase.camera.whichRegion();
             Action driveToPurpleDrop;
 
             Pose2d purpleDropSpot;
             Vector2d yellowDropSpot;
             if (randomization == 1) {
                 purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_1_B;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_1;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_BLUE_1;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
                         .strafeTo(FinalsAutoConstants.P_DROP_BLUE_1_A)
@@ -47,14 +51,14 @@ public final class FarBlue extends LinearOpMode {
                         .build();
             } else if (randomization == 2) {
                 purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_2_B;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_2;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_BLUE_2;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
                         .splineToConstantHeading(FinalsAutoConstants.P_DROP_BLUE_2_B.position, FinalsAutoConstants.P_DROP_BLUE_2_B_TANGENT)
                         .build();
             } else {
                 purpleDropSpot = FinalsAutoConstants.P_DROP_BLUE_3_A;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_3;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_BLUE_3;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
                         .splineToConstantHeading(FinalsAutoConstants.P_DROP_BLUE_3_A.position, FinalsAutoConstants.P_DROP_BLUE_3_A_TANGENT)
@@ -62,19 +66,19 @@ public final class FarBlue extends LinearOpMode {
             }
 
             Action driveToPixelBoard = robot.drivebase.drive.actionBuilder(purpleDropSpot)
-                    .strafeTo(FinalsAutoConstants.TRUSS_PASS_RED_A)
-                    .strafeToSplineHeading(FinalsAutoConstants.TRUSS_PASS_RED_B.position, FinalsAutoConstants.TRUSS_PASS_RED_B.heading)
-                    .strafeTo(FinalsAutoConstants.SPLINE_PRE_RED)
-                    .splineToConstantHeading(FinalsAutoConstants.SPLINE_POST_RED, FinalsAutoConstants.SPLINE_POST_RED_TANGENT)
+                    .strafeTo(FinalsAutoConstants.TRUSS_PASS_BLUE_A)
+                    .strafeToSplineHeading(FinalsAutoConstants.TRUSS_PASS_BLUE_B.position, FinalsAutoConstants.TRUSS_PASS_BLUE_B.heading)
+                    .strafeTo(FinalsAutoConstants.SPLINE_PRE_BLUE)
+                    .splineToConstantHeading(FinalsAutoConstants.SPLINE_POST_BLUE, FinalsAutoConstants.SPLINE_POST_BLUE_TANGENT)
                     .build();
 
-            Action driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(FinalsAutoConstants.SPLINE_POST_RED, FinalsAutoConstants.SPLINE_POST_RED_HEADING))
+            Action driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(FinalsAutoConstants.SPLINE_POST_BLUE, FinalsAutoConstants.SPLINE_POST_BLUE_HEADING))
                     .strafeTo(yellowDropSpot)
                     .build();
 
-            Action driveToPark = robot.drivebase.drive.actionBuilder(new Pose2d(yellowDropSpot, FinalsAutoConstants.SPLINE_POST_RED_HEADING))
-                    .strafeTo(FinalsAutoConstants.SAFE_PARK_TRANSITION_RED)
-                    .strafeToLinearHeading(FinalsAutoConstants.PARK_RED.position, FinalsAutoConstants.PARK_RED.heading)
+            Action driveToPark = robot.drivebase.drive.actionBuilder(new Pose2d(yellowDropSpot, FinalsAutoConstants.SPLINE_POST_BLUE_HEADING))
+                    .strafeTo(FinalsAutoConstants.SAFE_PARK_TRANSITION_BLUE)
+                    .strafeToLinearHeading(FinalsAutoConstants.PARK_BLUE.position, FinalsAutoConstants.PARK_BLUE.heading)
                     .build();
 
             //DRIVE TO DROP PIXEL
@@ -83,8 +87,8 @@ public final class FarBlue extends LinearOpMode {
                             new ParallelAction(
                                     (telemetryPacket) -> { // Slight lift in slides
                                         robot.pixelManipulator.arm.retract();
-                                        robot.pixelManipulator.slides.update(-80);
-                                        return true;
+                                        robot.pixelManipulator.slides.update(PIDSlides.SAFE_RESET_POS);
+                                        return isAtPixelPrep;
                                     },
                                     new SequentialAction(
                                             driveToPurpleDrop,
@@ -97,39 +101,63 @@ public final class FarBlue extends LinearOpMode {
                                                 robot.pixelManipulator.claw.stopIntake();
                                                 robot.pixelManipulator.arm.autoExtend();
                                                 return false;
+                                            },
+                                            driveToPixelBoard,
+                                            (telemetryPacket) -> { // End parallel action
+                                                isAtPixelPrep = true;
+                                                return false;
                                             }
-//                                            ,driveToPixelBoard
-                                        )
                                     )
-//                            ,(telemetryPacket) -> { // Lift Slides
-//                                robot.pixelManipulator.slides.setPower(-0.3);
-//                                robot.pixelManipulator.arm.extend();
-//                                return false;
-//                            },
-//                            new SleepAction(slideSleepInSeconds),
-//                            (telemetryPacket) -> { // Stop Slides
-//                                robot.pixelManipulator.slides.setPower(0);
-//                                return false;
-//                            },
-//                            driveToYellowDrop,
-//                            (telemetryPacket) -> { // Drop Yellow
-//                                robot.pixelManipulator.claw.releaseServo(robot.pixelManipulator.claw.rightClamp);
-//                                return false;
-//                            },
-//                            new SleepAction(sleepInSeconds),
-//                            driveToPark,
-//                            (telemetryPacket) -> { // Retract Arm
-//                                robot.pixelManipulator.arm.retract();
-//                                robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.leftClamp);
-//                                robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.rightClamp);
-//                                return robot.pixelManipulator.arm.isRetracted;
-//                            },
-//                            new SleepAction(sleepInSeconds),
-//                            (telemetryPacket) -> { // Retract Slides
-//                                robot.pixelManipulator.slides.setPower(0.3);
-//                                return false;
-//                            },
-//                            new SleepAction(slideSleepInSeconds)
+                            ),
+                            new ParallelAction(
+                                    (telemetryPacket) -> { // Lift Slides
+                                        robot.pixelManipulator.slides.update(PIDSlides.MIN_EXTENSION_POS);
+                                        return hasPixelDropped;
+                                    },
+                                    (telemetryPacket) -> { // Extend Arm
+                                        robot.pixelManipulator.arm.autoExtend();
+                                        return false;
+                                    },
+                                    new SequentialAction(
+                                            driveToYellowDrop,
+                                            (telemetryPacket) -> { // Drop Yellow
+                                                robot.pixelManipulator.claw.releaseServo(robot.pixelManipulator.claw.rightClamp);
+                                                return false;
+                                            },
+                                            new SleepAction(1.0),
+                                            (telemetryPacket) -> { // End parallel action
+                                                hasPixelDropped = true;
+                                                return false;
+                                            }
+                                    )
+                            ),
+                            new SequentialAction(
+                                    (telemetryPacket) -> { // Retract Arm and Clamp Releases
+                                        robot.pixelManipulator.arm.retract();
+                                        robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.leftClamp);
+                                        robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.rightClamp);
+                                        return false;
+                                    },
+                                    new SleepAction(1.0),
+                                    new ParallelAction(
+                                            (telemetryPacket) -> { // Retract Slides Almost
+                                                robot.pixelManipulator.slides.update(PIDSlides.SAFE_RESET_POS);
+                                                return isAtPark;
+                                            },
+                                            new SequentialAction(
+                                                    driveToPark,
+                                                    (telemetryPacket) -> { // End Auto
+                                                        isAtPark = true;
+                                                        return false;
+                                                    }
+                                            )
+                                    ),
+                                    (telemetryPacket) -> { // Retract Slides Fully
+                                        robot.pixelManipulator.slides.update(PIDSlides.RESET_POS);
+                                        return !robot.pixelManipulator.slides.isAtTargetPosition();
+                                    }
+
+                            )
                     )
             );
             break;

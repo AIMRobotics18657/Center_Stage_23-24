@@ -28,13 +28,15 @@ public final class FarRed extends LinearOpMode {
         robot.init(hardwareMap);
 
         waitForStart();
-        while (opModeInInit()) {
-            telemetry.addData("Randomization", robot.drivebase.getGameRandomization());
+        while (!isStarted() && !isStopRequested()) {
+            telemetry.addData("REGION: ", robot.drivebase.camera.whichRegion());
             telemetry.update();
         }
-        while (opModeIsActive()) {
-//            randomization = robot.drivebase.getGameRandomization();
-            randomization = 3;
+
+        robot.drivebase.camera.stopStreaming();
+
+        while (opModeIsActive() && !isStopRequested()) {
+            randomization = robot.drivebase.camera.whichRegion();
             Action driveToPurpleDrop;
 
             Pose2d purpleDropSpot;

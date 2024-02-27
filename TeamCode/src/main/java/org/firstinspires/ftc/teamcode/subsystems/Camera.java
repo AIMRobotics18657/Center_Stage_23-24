@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -9,16 +10,23 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.subsystems.settings.ConfigInfo;
+import org.firstinspires.ftc.teamcode.subsystems.vision.Pipeline;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Camera extends Mechanism {
+
+    OpenCvCamera openCvCamera;
+    Pipeline pipeline;
+
     private static VisionPortal visionPortal; // Used to manage the video source.
     private static AprilTagProcessor aprilTag; // Used for managing the AprilTag detection process
     private static AprilTagDetection detectedTag = null; // Used to hold the data for a detected AprilTag
@@ -132,8 +140,9 @@ public class Camera extends Mechanism {
      * Constructor for Camera
      * @param isCustomModel whether or not to use the custom model
      */
-    public Camera(boolean isCustomModel) {
+    public Camera(boolean isCustomModel, boolean isRedAlliance) {
         this.isCustomModel = isCustomModel;
+        pipeline = new Pipeline(isRedAlliance);
     }
 
     /**
@@ -142,8 +151,33 @@ public class Camera extends Mechanism {
      */
     @Override
     public void init(HardwareMap hwMap) {
+        int cameraMonitorViewId = hwMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwMap.appContext.getPackageName());
+        openCvCamera = OpenCvCameraFactory.getInstance().createWebcam(hwMap.get(WebcamName.class, ConfigInfo.camera.getDeviceName()), cameraMonitorViewId);
+        openCvCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                openCvCamera.startStreaming(640, 480);
+                FtcDashboard.getInstance().startCameraStream(openCvCamera, 0);
+                openCvCamera.setPipeline(pipeline);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+        initAT();
+        initTFOD();
+        initVisionPortal(hwMap);
+    }
+
+    public void initAT() {
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
+        aprilTag.setDecimation(3);
+    }
+
+    public void initTFOD() {
         if (isCustomModel) {
             tfod = new TfodProcessor.Builder()
                     .setModelAssetName(TFOD_MODEL_ASSET)
@@ -153,15 +187,16 @@ public class Camera extends Mechanism {
             tfod = new TfodProcessor.Builder()
                     .build();
         }
+        tfod.setMinResultConfidence(MINIMUM_CONFIDENCE);
+    }
 
+    public void initVisionPortal(HardwareMap hwMap) {
+        setManualExposure(exposureMS, gain);
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, ConfigInfo.camera.getDeviceName()))
                 .addProcessor(aprilTag)
                 .addProcessor(tfod)
                 .build();
-        aprilTag.setDecimation(3);
-        setManualExposure(exposureMS, gain);
-        tfod.setMinResultConfidence(MINIMUM_CONFIDENCE);
     }
 
     /**
@@ -191,6 +226,15 @@ public class Camera extends Mechanism {
         exposureControl.setExposure(exposureMS, TimeUnit.MILLISECONDS);
         GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
         gainControl.setGain(gain);
+    }
+
+    public int whichRegion() {
+        return pipeline.whichRegion();
+    }
+
+    public void stopStreaming() {
+        openCvCamera.stopStreaming();
+        openCvCamera.closeCameraDevice();
     }
 
     /**

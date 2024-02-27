@@ -37,10 +37,18 @@ public class FinalsAutoConstants {
     public static final Vector2d TRUSS_PASS_RED_A = new Vector2d(-36, -38);
     public static final Pose2d TRUSS_PASS_RED_B = new Pose2d(-40, -63, Math.toRadians(0));
 
+    public static final Vector2d TRUSS_PASS_BLUE_A = new Vector2d(-36, 38);
+    public static final Pose2d TRUSS_PASS_BLUE_B = new Pose2d(-40, 63, Math.toRadians(0));
+
     public static final Vector2d SPLINE_PRE_RED = new Vector2d(12, -59);
     public static final Vector2d SPLINE_POST_RED = new Vector2d(30, -36);
     public static final double SPLINE_POST_RED_HEADING = Math.toRadians(0);
     public static final double SPLINE_POST_RED_TANGENT = Math.toRadians(0);
+
+    public static final Vector2d SPLINE_PRE_BLUE = new Vector2d(12, 59);
+    public static final Vector2d SPLINE_POST_BLUE = new Vector2d(30, 36);
+    public static final double SPLINE_POST_BLUE_HEADING = Math.toRadians(0);
+    public static final double SPLINE_POST_BLUE_TANGENT = Math.toRadians(0);
 
 
     public static final double PIXEL_BOARD_X = 58;
@@ -48,8 +56,12 @@ public class FinalsAutoConstants {
     public static final Vector2d Y_DROP_RED_1 = new Vector2d(PIXEL_BOARD_X_DROP, -27);
     public static final Vector2d Y_DROP_RED_2 = new Vector2d(PIXEL_BOARD_X_DROP, -34);
     public static final Vector2d Y_DROP_RED_3 = new Vector2d(PIXEL_BOARD_X_DROP, -41);
+    public static final Vector2d Y_DROP_BLUE_1 = new Vector2d(PIXEL_BOARD_X_DROP, 27); // TODO change
+    public static final Vector2d Y_DROP_BLUE_2 = new Vector2d(PIXEL_BOARD_X_DROP, 34); // TODO change
+    public static final Vector2d Y_DROP_BLUE_3 = new Vector2d(PIXEL_BOARD_X_DROP, 41); // TODO change
 
     public static final Vector2d SAFE_PARK_TRANSITION_RED = new Vector2d(40, -23);
+    public static final Vector2d SAFE_PARK_TRANSITION_BLUE = new Vector2d(40, 23);
     public static final Pose2d PARK_RED = new Pose2d(48, -12, Math.toRadians(180));
-
+    public static final Pose2d PARK_BLUE = new Pose2d(48, 12, Math.toRadians(180));
 }

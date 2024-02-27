@@ -28,7 +28,7 @@ public class SystemsCheck extends OpMode {
     }
     Drivebase drivebase = new Drivebase(true, new Pose2d(0, 0, 0), true);
     Odometry odometry;
-    Camera camera = new Camera(false);
+    Camera camera = new Camera(false, true);
     Claw claw = new Claw();
     Arm arm = new Arm();
     PIDSlides slides = new PIDSlides();
