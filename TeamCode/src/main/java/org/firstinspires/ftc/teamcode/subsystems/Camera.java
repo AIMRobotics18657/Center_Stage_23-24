@@ -212,8 +212,8 @@ public class Camera extends Mechanism {
      */
     @Override
     public void telemetry(Telemetry telemetry) {
-        telemetryTag(telemetry);
-        telemetryTfod(telemetry);
+//        telemetryTag(telemetry);
+//        telemetryTfod(telemetry);
     }
 
     /**
@@ -363,9 +363,9 @@ public class Camera extends Mechanism {
 
     @Override
     public void systemsCheck(Gamepad gamepad, Telemetry telemetry) {
-        checkDetections();
-        telemetryTag(telemetry);
-        getTfodElementPos();
-        telemetryTfod(telemetry);
+//        checkDetections();
+//        telemetryTag(telemetry);
+//        getTfodElementPos();
+//        telemetryTfod(telemetry);
     }
 }

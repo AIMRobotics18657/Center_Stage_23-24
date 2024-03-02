@@ -14,9 +14,10 @@ public class Arm extends Mechanism {
     public Servo leftArm;
     public Servo rightArm;
 
-    private static final double AUTO_EXTENDED_POSITION = 0.58;
-    private static final double EXTENDED_POSITION = 0.58;
-    private static final double RETRACTED_POSITION = 0.95;
+    private static final double AUTO_EXTENDED_POSITION = 0.825;
+    private static final double AUTO_RETRACTED_POSITION = 0.79;
+    private static final double EXTENDED_POSITION = 0.375;
+    private static final double RETRACTED_POSITION = 0.88;
     private static final double FULL_RETRACTED = 1;
 
     private static final double CLOSE_THRESHOLD = 0.01;
@@ -30,7 +31,8 @@ public class Arm extends Mechanism {
     public void init(HardwareMap hwMap) {
         leftArm = hwMap.get(Servo.class, ConfigInfo.leftArm.getDeviceName());
         rightArm = hwMap.get(Servo.class, ConfigInfo.rightArm.getDeviceName());
-        rightArm.setDirection(Servo.Direction.REVERSE);
+        leftArm.setDirection(Servo.Direction.REVERSE);
+        setRetractPos();
     }
 
     @Override
@@ -62,6 +64,11 @@ public class Arm extends Mechanism {
         rightArm.setPosition(AUTO_EXTENDED_POSITION);
     }
 
+    public void autoRetract() {
+        leftArm.setPosition(AUTO_RETRACTED_POSITION);
+        rightArm.setPosition(AUTO_RETRACTED_POSITION);
+    }
+
     public void setSafeRetractPos() {
         activeRetractPos = FULL_RETRACTED;
     }
@@ -77,9 +84,9 @@ public class Arm extends Mechanism {
         } else if (gamepad.b) {
             retract();
         } else if (gamepad.dpad_up) {
-            ServoUtil.increment(leftArm, rightArm, 0.01);
+            ServoUtil.increment(leftArm, rightArm, 0.005);
         } else if (gamepad.dpad_down) {
-            ServoUtil.increment(leftArm, rightArm, -0.01);
+            ServoUtil.increment(leftArm, rightArm, -0.005);
         }
 
         telemetry.addData("Left Arm Position:", leftArm.getPosition());

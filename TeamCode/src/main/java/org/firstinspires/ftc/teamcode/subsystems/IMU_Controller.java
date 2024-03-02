@@ -15,7 +15,7 @@ public class IMU_Controller extends Mechanism {
             RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
     public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
             RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
-    private IMU imu;
+    public IMU imu;
 
     public IMU_Controller(HardwareMap hwMap, boolean resetYAW) {
         imu = hwMap.get(IMU.class, ConfigInfo.imu.getDeviceName());

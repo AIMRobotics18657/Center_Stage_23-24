@@ -9,10 +9,10 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class Pipeline extends OpenCvPipeline {
 
-    public Scalar redLowHSV = new Scalar(0, 100, 100);
-    public Scalar redHighHSV = new Scalar(10, 216, 255);
-    public Scalar blueLowHSV = new Scalar(100, 107, 70);
-    public Scalar blueHighHSV = new Scalar(255, 220, 255);
+    public Scalar redLowHSV = new Scalar(0, 50, 80);
+    public Scalar redHighHSV = new Scalar(25, 230, 255);
+    public Scalar blueLowHSV = new Scalar(80, 70, 55);
+    public Scalar blueHighHSV = new Scalar(255, 255, 255);
 
     public double tolerance = 0.05;
 
@@ -31,7 +31,7 @@ public class Pipeline extends OpenCvPipeline {
     int region = 2;
 
     public Pipeline() {
-        this.isRedAlliance = true;
+        this.isRedAlliance = false;
     }
 
     public Pipeline(Boolean isRedAlliance) {

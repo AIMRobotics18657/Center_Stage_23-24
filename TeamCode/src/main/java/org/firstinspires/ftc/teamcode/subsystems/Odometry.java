@@ -15,7 +15,7 @@ public class Odometry extends Mechanism {
     public Odometry(HardwareMap hwMap) {
         par0 = hwMap.get(DcMotor.class, ConfigInfo.leftBack.getDeviceName());
         par1 = hwMap.get(DcMotor.class, ConfigInfo.rightBack.getDeviceName());
-        perp = hwMap.get(DcMotor.class, ConfigInfo.intake.getDeviceName());
+        perp = hwMap.get(DcMotor.class, ConfigInfo.leftFront.getDeviceName());
 
         par0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         par1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -51,17 +51,18 @@ public class Robot extends Mechanism {
         pixelManipulator.loop(gamepad, gamepad2);
         drivebase.loop(gamepad);
         timer.loop(gamepad);
+        pal.loop(gamepad);
 
         isEndGame = timer.getTime() > ENDGAME_TIMESTAMP;
         isDrivebaseSpeeding = drivebase.isDriveSpeeding(gamepad);
         if (isEndGame) {
+            pixelManipulator.setHangModeEnabled(true);
+            pal.enable();
             if (!hasEndgameRumbled) {
                 gamepad.runRumbleEffect(GamepadSettings.endgameEffect);
                 gamepad2.runRumbleEffect(GamepadSettings.endgameEffect);
                 hasEndgameRumbled = true;
             }
-            pal.loop(gamepad);
-            pixelManipulator.setHangModeEnabled(true);
         }
         if (isDrivebaseSpeeding) {
             pixelManipulator.slides.setSafeResetPos();

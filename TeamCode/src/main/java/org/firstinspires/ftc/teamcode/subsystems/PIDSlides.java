@@ -71,10 +71,12 @@ public class PIDSlides extends Mechanism {
     public static final double PROXIMITY_THRESHOLD = 10;
 
     public static final int RESET_POS = 0;
-    public static final int SAFE_RESET_POS = -25;
+    public static final int SAFE_RESET_POS = -35;
+    public static final int AUTO_RESET_POS = -80;
+    public static final int AUTO_LIFT_POS_FAR = -1000;
 
-    public static final int MIN_EXTENSION_POS = -630;
-    public static final int HANGING_POS = -425;
+    public static final int MIN_EXTENSION_POS = -500;
+    public static final int HANGING_POS = -350;
     public static final int FULL_EXTENSION_POS = -2170;
     public static int activeResetPos = SAFE_RESET_POS;
 

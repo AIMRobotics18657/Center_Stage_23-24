@@ -6,20 +6,21 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.opModes.auto.FinalsAutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@TeleOp(name="CompTeleOp", group="Tests")
-public class CompTeleOp extends OpMode {
+@TeleOp(name="BlueTeleOp", group="Tests")
+public class BlueTeleOp extends OpMode {
 
     Robot robot;
 
     @Override
     public void init() {
-        robot = new Robot(true, FinalsAutoConstants.PARK_RED, false);
+        robot = new Robot(false, FinalsAutoConstants.PARK_BLUE_AWAY, false);
         robot.init(hardwareMap);
     }
 
     @Override
     public void start() {
         robot.start();
+        robot.drivebase.camera.stopStreaming();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes;
+package org.firstinspires.ftc.teamcode.opModes.auto;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -10,18 +10,16 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.opModes.auto.FinalsAutoConstants;
 import org.firstinspires.ftc.teamcode.subsystems.PIDSlides;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name = "FarBlue", group = "AAA_COMP", preselectTeleOp="CompTeleOp")
-public final class CloseRed extends LinearOpMode {
+@Autonomous(name = "CloseRedAwayPark", group = "AAA_COMP", preselectTeleOp="RedTeleOp")
+public final class CloseRedAwayPark extends LinearOpMode {
     Robot robot = new Robot(true, FinalsAutoConstants.START_NEAR_RED_POSE, true);
     int randomization;
 
     boolean isAtPixelPrep = true;
     boolean hasPixelDropped = true;
-    boolean isAtPark = true;
 
     @Override
     public void runOpMode() {
@@ -43,7 +41,7 @@ public final class CloseRed extends LinearOpMode {
             Vector2d yellowDropSpot;
             if (randomization == 1) {
                 purpleDropSpot = FinalsAutoConstants.P_DROP_RED_1_B_CLOSE;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_1;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_1_CLOSE;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
                         .strafeTo(FinalsAutoConstants.P_DROP_RED_1_A_CLOSE)
@@ -51,14 +49,14 @@ public final class CloseRed extends LinearOpMode {
                         .build();
             } else if (randomization == 2) {
                 purpleDropSpot = FinalsAutoConstants.P_DROP_RED_2_A_CLOSE;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_2;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_2_CLOSE;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
                         .splineToConstantHeading(FinalsAutoConstants.P_DROP_RED_2_A_CLOSE.position, FinalsAutoConstants.P_DROP_RED_2_A_TANGENT_CLOSE)
                         .build();
             } else {
                 purpleDropSpot = FinalsAutoConstants.P_DROP_RED_3_A_CLOSE;
-                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_3;
+                yellowDropSpot = FinalsAutoConstants.Y_DROP_RED_3_CLOSE;
 
                 driveToPurpleDrop = robot.drivebase.drive.actionBuilder(robot.drivebase.drive.pose)
                         .splineToConstantHeading(FinalsAutoConstants.P_DROP_RED_3_A_CLOSE.position, FinalsAutoConstants.P_DROP_RED_3_A_TANGENT_CLOSE)
@@ -66,7 +64,10 @@ public final class CloseRed extends LinearOpMode {
             }
 
             Action driveToPixelBoard = robot.drivebase.drive.actionBuilder(purpleDropSpot)
-                    .splineToSplineHeading(new Pose2d(FinalsAutoConstants.SPLINE_POST_RED, FinalsAutoConstants.PIXEL_BOARD_HEADING), FinalsAutoConstants.SPLINE_POST_RED_TANGENT)
+                    .strafeTo(FinalsAutoConstants.PREP_CLOSE_RED_A)
+                    .strafeToSplineHeading(FinalsAutoConstants.PREP_CLOSE_RED_B.position, FinalsAutoConstants.PREP_CLOSE_RED_B.heading)
+                    .strafeTo(FinalsAutoConstants.SPLINE_PRE_RED)
+                    .splineToConstantHeading(FinalsAutoConstants.SPLINE_POST_RED, FinalsAutoConstants.SPLINE_POST_RED_TANGENT)
                     .build();
 
             Action driveToYellowDrop = robot.drivebase.drive.actionBuilder(new Pose2d(FinalsAutoConstants.SPLINE_POST_RED, FinalsAutoConstants.PIXEL_BOARD_HEADING))
@@ -75,7 +76,7 @@ public final class CloseRed extends LinearOpMode {
 
             Action driveToPark = robot.drivebase.drive.actionBuilder(new Pose2d(yellowDropSpot, FinalsAutoConstants.PIXEL_BOARD_HEADING))
                     .strafeTo(FinalsAutoConstants.SAFE_PARK_TRANSITION_RED)
-                    .strafeToLinearHeading(FinalsAutoConstants.PARK_RED.position, FinalsAutoConstants.PARK_RED.heading)
+                    .strafeToLinearHeading(FinalsAutoConstants.PARK_RED_AWAY.position, FinalsAutoConstants.PARK_RED_AWAY.heading)
                     .build();
 
             //DRIVE TO DROP PIXEL
@@ -83,20 +84,21 @@ public final class CloseRed extends LinearOpMode {
                     new SequentialAction(
                             new ParallelAction(
                                     (telemetryPacket) -> { // Slight lift in slides
-                                        robot.pixelManipulator.arm.retract();
-                                        robot.pixelManipulator.slides.update(PIDSlides.SAFE_RESET_POS);
+                                        robot.pixelManipulator.arm.autoExtend();
+                                        robot.pixelManipulator.slides.update(PIDSlides.AUTO_RESET_POS);
                                         return isAtPixelPrep;
                                     },
                                     new SequentialAction(
                                             driveToPurpleDrop,
                                             (telemetryPacket) -> { // Drop Purple
-                                                robot.pixelManipulator.claw.outtake();
+                                                robot.pixelManipulator.claw.spinVelo(-250);
                                                 return false;
                                             },
-                                            new SleepAction(0.2),
-                                            (telemetryPacket) -> { // Drop Purple
+                                            new SleepAction(0.65),
+                                            (telemetryPacket) -> { // Stop Intake
                                                 robot.pixelManipulator.claw.stopIntake();
-                                                robot.pixelManipulator.arm.autoExtend();
+                                                robot.pixelManipulator.arm.setSafeRetractPos();
+                                                robot.pixelManipulator.arm.autoRetract();
                                                 return false;
                                             },
                                             driveToPixelBoard,
@@ -113,7 +115,7 @@ public final class CloseRed extends LinearOpMode {
                                     },
                                     new SequentialAction(
                                             (telemetryPacket) -> { // Extend Arm
-                                                robot.pixelManipulator.arm.autoExtend();
+                                                robot.pixelManipulator.arm.extend();
                                                 return false;
                                             },
                                             new SleepAction(1.0),
@@ -126,7 +128,12 @@ public final class CloseRed extends LinearOpMode {
                                             (telemetryPacket) -> { // End parallel action
                                                 hasPixelDropped = false;
                                                 return false;
-                                            }
+                                            },
+                                            (telemetryPacket) -> {
+                                                robot.pixelManipulator.slides.update(PIDSlides.AUTO_LIFT_POS_FAR);
+                                                return !robot.pixelManipulator.slides.isAtTargetPosition();
+                                            },
+                                            driveToPark
                                     )
                             ),
                             new SequentialAction(
@@ -136,20 +143,7 @@ public final class CloseRed extends LinearOpMode {
                                         robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.rightClamp);
                                         return false;
                                     },
-                                    new SleepAction(1.0),
-                                    new ParallelAction(
-                                            (telemetryPacket) -> { // Retract Slides Almost
-                                                robot.pixelManipulator.slides.update(PIDSlides.SAFE_RESET_POS);
-                                                return isAtPark;
-                                            },
-                                            new SequentialAction(
-                                                    driveToPark,
-                                                    (telemetryPacket) -> { // End Auto
-                                                        isAtPark = false;
-                                                        return false;
-                                                    }
-                                            )
-                                    ),
+                                    new SleepAction(1.5),
                                     (telemetryPacket) -> { // Retract Slides Fully
                                         robot.pixelManipulator.slides.update(PIDSlides.RESET_POS);
                                         return !robot.pixelManipulator.slides.isAtTargetPosition();
