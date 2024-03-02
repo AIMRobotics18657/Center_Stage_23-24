@@ -73,6 +73,14 @@ public class Claw extends Mechanism {
             spinningIntake.setPower(-0.35);
         }
 
+        public void outtake(double power) {
+            spinningIntake.setPower(power);
+        }
+
+        public void spinVelo(double velocity) {
+            spinningIntake.setVelocity(velocity);
+        }
+
         public void stopIntake() {
             spinningIntake.setPower(0);
         }
@@ -94,14 +102,15 @@ public class Claw extends Mechanism {
             }
 
             if (gamepad.left_trigger > 0.01){
-                spinningIntake.setPower(gamepad.left_trigger);
-            } else if (gamepad.right_trigger > 0.01){
-                spinningIntake.setPower(-gamepad.right_trigger);
+                spinningIntake.setVelocity(gamepad.left_trigger*-1000);
+            } else {
+                spinningIntake.setVelocity(0);
             }
 
 
             telemetry.addData("Left Prong Position", leftClamp.getPosition());
             telemetry.addData("Right Prong Position", rightClamp.getPosition());
+            telemetry.addData("IntakeVelo:", spinningIntake.getVelocity());
             telemetry.addData("isLeftClamped", isLeftClamped);
             telemetry.addData("isRightClamped", isRightClamped);
             telemetry.addData("isLeftReleased", isLeftReleased);

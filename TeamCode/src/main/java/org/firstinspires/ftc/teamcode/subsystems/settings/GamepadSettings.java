@@ -10,8 +10,8 @@ public class GamepadSettings {
     public static final double VY_WEIGHT = 1;
     public static final double VRX_WEIGHT = .92;
 
-    public static final double VX_WEIGHT_SLOW = 0.75;
-    public static final double VY_WEIGHT_SLOW = 0.70;
+    public static final double VX_WEIGHT_SLOW = 0.78;
+    public static final double VY_WEIGHT_SLOW = 0.73;
     public static final double VRX_WEIGHT_SLOW = 0.58;
 
     public static final double GP1_STICK_DEADZONE = 0.05;

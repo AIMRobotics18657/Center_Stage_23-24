@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.PIDSlides;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Autonomous(name = "FarBlue", group = "AAA_COMP", preselectTeleOp="CompTeleOp")
+@Autonomous(name = "FarBlue", group = "AAA_COMP", preselectTeleOp="BlueTeleOp")
 public final class FarBlue extends LinearOpMode {
     Robot robot = new Robot(false, FinalsAutoConstants.START_FAR_BLUE_POSE, true);
     int randomization;
@@ -77,7 +77,7 @@ public final class FarBlue extends LinearOpMode {
 
             Action driveToPark = robot.drivebase.drive.actionBuilder(new Pose2d(yellowDropSpot, FinalsAutoConstants.SPLINE_POST_BLUE_HEADING))
                     .strafeTo(FinalsAutoConstants.SAFE_PARK_TRANSITION_BLUE)
-                    .strafeToLinearHeading(FinalsAutoConstants.PARK_BLUE.position, FinalsAutoConstants.PARK_BLUE.heading)
+//                    .strafeToLinearHeading(FinalsAutoConstants.PARK_BLUE.position, FinalsAutoConstants.PARK_BLUE.heading)
                     .build();
 
             //DRIVE TO DROP PIXEL
@@ -85,22 +85,24 @@ public final class FarBlue extends LinearOpMode {
                     new SequentialAction(
                             new ParallelAction(
                                     (telemetryPacket) -> { // Slight lift in slides
-                                        robot.pixelManipulator.arm.retract();
-                                        robot.pixelManipulator.slides.update(PIDSlides.SAFE_RESET_POS);
+                                        robot.pixelManipulator.arm.autoExtend();
+                                        robot.pixelManipulator.slides.update(PIDSlides.AUTO_RESET_POS);
                                         return isAtPixelPrep;
                                     },
                                     new SequentialAction(
                                             driveToPurpleDrop,
                                             (telemetryPacket) -> { // Drop Purple
-                                                robot.pixelManipulator.claw.outtake();
+                                                robot.pixelManipulator.claw.spinVelo(-250);
                                                 return false;
                                             },
-                                            new SleepAction(0.2),
-                                            (telemetryPacket) -> { // Drop Purple
+                                            new SleepAction(0.65),
+                                            (telemetryPacket) -> { // Stop Intake
                                                 robot.pixelManipulator.claw.stopIntake();
-                                                robot.pixelManipulator.arm.autoExtend();
+                                                robot.pixelManipulator.arm.setSafeRetractPos();
+                                                robot.pixelManipulator.arm.autoRetract();
                                                 return false;
                                             },
+                                            new SleepAction(9),
                                             driveToPixelBoard,
                                             (telemetryPacket) -> { // End parallel action
                                                 isAtPixelPrep = false;
@@ -110,12 +112,12 @@ public final class FarBlue extends LinearOpMode {
                             ),
                             new ParallelAction(
                                     (telemetryPacket) -> { // Lift Slides
-                                        robot.pixelManipulator.slides.update(PIDSlides.MIN_EXTENSION_POS);
+                                        robot.pixelManipulator.slides.update(PIDSlides.AUTO_LIFT_POS_FAR);
                                         return hasPixelDropped;
                                     },
                                     new SequentialAction(
                                             (telemetryPacket) -> { // Extend Arm
-                                                robot.pixelManipulator.arm.autoExtend();
+                                                robot.pixelManipulator.arm.extend();
                                                 return false;
                                             },
                                             new SleepAction(1.0),
@@ -125,6 +127,7 @@ public final class FarBlue extends LinearOpMode {
                                                 return false;
                                             },
                                             new SleepAction(1.0),
+                                            driveToPark,
                                             (telemetryPacket) -> { // End parallel action
                                                 hasPixelDropped = false;
                                                 return false;
@@ -138,20 +141,7 @@ public final class FarBlue extends LinearOpMode {
                                         robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.rightClamp);
                                         return false;
                                     },
-                                    new SleepAction(1.0),
-                                    new ParallelAction(
-                                            (telemetryPacket) -> { // Retract Slides Almost
-                                                robot.pixelManipulator.slides.update(PIDSlides.SAFE_RESET_POS);
-                                                return isAtPark;
-                                            },
-                                            new SequentialAction(
-                                                    driveToPark,
-                                                    (telemetryPacket) -> { // End Auto
-                                                        isAtPark = false;
-                                                        return false;
-                                                    }
-                                            )
-                                    ),
+                                    new SleepAction(1.5),
                                     (telemetryPacket) -> { // Retract Slides Fully
                                         robot.pixelManipulator.slides.update(PIDSlides.RESET_POS);
                                         return !robot.pixelManipulator.slides.isAtTargetPosition();

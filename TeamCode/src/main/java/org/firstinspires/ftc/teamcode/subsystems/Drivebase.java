@@ -5,9 +5,11 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.settings.GamepadSettings;
 import org.firstinspires.ftc.teamcode.util.Mechanism;
@@ -70,11 +72,13 @@ public class Drivebase extends Mechanism {
      */
     @Override
     public void telemetry(Telemetry telemetry) {
-        camera.telemetry(telemetry);
+//        camera.telemetry(telemetry);
         telemetry.addData("DrivebaseSpeeding", isDriveSpeeding(new Gamepad()));
         telemetry.addData("Slow Mode Enabled", isSlowModeEnabled);
-        telemetry.addData("Pose Data", camera.getDesiredTagPoseData());
-        telemetry.addData("Current Detections", camera.getDetections());
+        telemetry.addData("Target Angle:", targetHeading);
+        telemetry.addData("Heading:", imu.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+//        telemetry.addData("Pose Data", camera.getDesiredTagPoseData());
+//        telemetry.addData("Current Detections", camera.getDetections());
     }
 
     /**
@@ -84,9 +88,9 @@ public class Drivebase extends Mechanism {
     public void drive(Gamepad gamepad) {
         isSlowModeEnabled = gamepad.right_trigger > GamepadSettings.GP1_TRIGGER_DEADZONE; // TODO: Change to a different button
         if (isSlowModeEnabled) {
-            if (camera.getCameraState() == VisionPortal.CameraState.STREAMING) {
-                camera.checkDetections();
-            }
+//            if (camera.getCameraState() == VisionPortal.CameraState.STREAMING) {
+//                camera.checkDetections();
+//            }
             drive.setDrivePowers(clampSpeedsToPoseVelocity(-gamepad.left_stick_y, -gamepad.left_stick_x, -gamepad.right_stick_x));
         } else {
             drive.setDrivePowers(inputToPoseVel(-gamepad.left_stick_y, -gamepad.left_stick_x, -gamepad.right_stick_x));
@@ -179,7 +183,7 @@ public class Drivebase extends Mechanism {
      * @return if the drivebase is speeding
      */
     public boolean isDriveSpeeding(Gamepad gamepad) {
-        final double SPEEDING_CONST = 0.9;
+        final double SPEEDING_CONST = 0.83;
         return Math.abs(gamepad.left_stick_y) > SPEEDING_CONST ||
                 Math.abs(gamepad.left_stick_x) > SPEEDING_CONST ||
                 Math.abs(gamepad.right_stick_x) > SPEEDING_CONST;

@@ -11,20 +11,25 @@ import org.firstinspires.ftc.teamcode.util.ServoUtil;
 
 public class PAL extends Mechanism {
     private Servo releaseServo;
+    boolean enabled = false;
 
-    private static final double RELEASE_POSITION = 0.3;
+    private static final double RELEASE_POSITION = 0.4;
     private static final double CLAMP_POSITION = 0.69;
     @Override
     public void init(HardwareMap hwMap) {
         releaseServo = hwMap.get(Servo.class, ConfigInfo.releaseServo.getDeviceName());
-
         releaseServo.setPosition(CLAMP_POSITION);
+        disable();
     }
 
     @Override
     public void loop(Gamepad gamepad) {
-        if (gamepad.dpad_up) {
+
+        boolean shooterEnabled = (gamepad.dpad_up && enabled) || (gamepad.dpad_up && gamepad.y);
+        if (shooterEnabled) {
             releaseServo.setPosition(RELEASE_POSITION);
+        } else {
+            releaseServo.setPosition(CLAMP_POSITION);
         }
     }
 
@@ -40,5 +45,13 @@ public class PAL extends Mechanism {
             ServoUtil.increment(releaseServo, -0.005);
         }
         telemetry.addData("Release Servo Position: ", releaseServo.getPosition());
+    }
+
+    public void enable() {
+        enabled = true;
+    }
+
+    public void disable() {
+        enabled = false;
     }
 }
