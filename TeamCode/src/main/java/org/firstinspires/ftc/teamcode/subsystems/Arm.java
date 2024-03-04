@@ -14,10 +14,10 @@ public class Arm extends Mechanism {
     public Servo leftArm;
     public Servo rightArm;
 
-    private static final double AUTO_EXTENDED_POSITION = 0.825;
-    private static final double AUTO_RETRACTED_POSITION = 0.79;
-    private static final double EXTENDED_POSITION = 0.375;
-    private static final double RETRACTED_POSITION = 0.88;
+    private static final double AUTO_EXTENDED_POSITION = 0.80;
+    private static final double AUTO_RETRACTED_POSITION = 0.765;
+    private static final double EXTENDED_POSITION = 0.35;
+    private static final double RETRACTED_POSITION = 0.855;
     private static final double FULL_RETRACTED = 1;
 
     private static final double CLOSE_THRESHOLD = 0.01;
