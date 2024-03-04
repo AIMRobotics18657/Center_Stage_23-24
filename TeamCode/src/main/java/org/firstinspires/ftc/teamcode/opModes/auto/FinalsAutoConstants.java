@@ -27,7 +27,7 @@ public class FinalsAutoConstants {
     public static final Vector2d P_DROP_BLUE_1_A = new Vector2d(-40, 40);
     public static final Pose2d P_DROP_BLUE_1_B = new Pose2d(-35.5, 37, Math.toRadians(0));
     public static final double P_DROP_BLUE_1_B_TANGENT = Math.toRadians(0);
-    public static final Pose2d P_DROP_BLUE_2_A = new Pose2d(-36, 41, Math.toRadians(270));
+    public static final Pose2d P_DROP_BLUE_2_A = new Pose2d(-36, 40, Math.toRadians(270));
     public static final double P_DROP_BLUE_2_A_TANGENT = Math.toRadians(90);
     public static final Pose2d P_DROP_BLUE_3_A = new Pose2d(-54, 44, Math.toRadians(270));
     public static final double P_DROP_BLUE_3_A_TANGENT = Math.toRadians(90);
@@ -58,16 +58,16 @@ public class FinalsAutoConstants {
 
 
     public static final Vector2d P_DROP_RED_1_A_CLOSE = new Vector2d(16, -40);
-    public static final Pose2d P_DROP_RED_1_B_CLOSE = new Pose2d(12.5, -35, Math.toRadians(180));
+    public static final Pose2d P_DROP_RED_1_B_CLOSE = new Pose2d(10.75, -35, Math.toRadians(180));
     public static final double P_DROP_RED_1_B_TANGENT_CLOSE = Math.toRadians(0);
-    public static final Pose2d P_DROP_RED_2_A_CLOSE = new Pose2d(12, -40, Math.toRadians(90));
+    public static final Pose2d P_DROP_RED_2_A_CLOSE = new Pose2d(12, -38.5, Math.toRadians(90));
     public static final double P_DROP_RED_2_A_TANGENT_CLOSE = Math.toRadians(90);
-    public static final Pose2d P_DROP_RED_3_A_CLOSE = new Pose2d(28.25, -45, Math.toRadians(90));
+    public static final Pose2d P_DROP_RED_3_A_CLOSE = new Pose2d(29.25, -45, Math.toRadians(90));
     public static final double P_DROP_RED_3_A_TANGENT_CLOSE = Math.toRadians(90);
 
     public static final Pose2d P_DROP_BLUE_1_A_CLOSE = new Pose2d(26, 43, Math.toRadians(270));
     public static final double P_DROP_BLUE_1_A_TANGENT_CLOSE = Math.toRadians(90);
-    public static final Pose2d P_DROP_BLUE_2_A_CLOSE = new Pose2d(12, 40, Math.toRadians(270));
+    public static final Pose2d P_DROP_BLUE_2_A_CLOSE = new Pose2d(12, 38.5, Math.toRadians(270));
     public static final double P_DROP_BLUE_2_A_TANGENT_CLOSE = Math.toRadians(90);
     public static final Vector2d P_DROP_BLUE_3_A_CLOSE = new Vector2d(16, 40);
     public static final Pose2d P_DROP_BLUE_3_B_CLOSE = new Pose2d(12, 37, Math.toRadians(180));
@@ -93,8 +93,8 @@ public class FinalsAutoConstants {
     public static final double Y_DROP_RED_TANGENT = Math.toRadians(90);
     public static final double Y_DROP_BLUE_TANGENT = Math.toRadians(90);
 
-    public static final Vector2d SAFE_PARK_TRANSITION_RED = new Vector2d(40, -23);
-    public static final Vector2d SAFE_PARK_TRANSITION_BLUE = new Vector2d(40, 23);
+    public static final Vector2d SAFE_PARK_TRANSITION_RED = new Vector2d(43, -23);
+    public static final Vector2d SAFE_PARK_TRANSITION_BLUE = new Vector2d(43, 23);
     public static final Pose2d PARK_RED_AWAY = new Pose2d(48, -15, Math.toRadians(0));
     public static final Pose2d PARK_BLUE_AWAY = new Pose2d(48, 15, Math.toRadians(0));
     public static final Pose2d PARK_RED_WALL_SIDE = new Pose2d(50, -65, Math.toRadians(0));

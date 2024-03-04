@@ -73,7 +73,7 @@ public class PIDSlides extends Mechanism {
     public static final int RESET_POS = 0;
     public static final int SAFE_RESET_POS = -35;
     public static final int AUTO_RESET_POS = -80;
-    public static final int AUTO_LIFT_POS_FAR = -1000;
+    public static final int AUTO_LIFT_POS_FAR = -900;
 
     public static final int MIN_EXTENSION_POS = -500;
     public static final int HANGING_POS = -350;

@@ -127,15 +127,21 @@ public final class FarBlue extends LinearOpMode {
                                                 return false;
                                             },
                                             new SleepAction(1.0),
-                                            driveToPark,
                                             (telemetryPacket) -> { // End parallel action
                                                 hasPixelDropped = false;
                                                 return false;
-                                            }
+                                            },
+                                            (telemetryPacket) -> {
+                                                robot.pixelManipulator.slides.update(PIDSlides.AUTO_LIFT_POS_FAR - 150);
+                                                return !robot.pixelManipulator.slides.isAtTargetPosition();
+                                            },
+                                            driveToPark
                                     )
                             ),
                             new SequentialAction(
                                     (telemetryPacket) -> { // Retract Arm and Clamp Releases
+                                        robot.pixelManipulator.slides.setPower(0);
+                                        robot.pixelManipulator.arm.setRetractPos();
                                         robot.pixelManipulator.arm.retract();
                                         robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.leftClamp);
                                         robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.rightClamp);

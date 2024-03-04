@@ -138,6 +138,8 @@ public final class CloseRedWallPark extends LinearOpMode {
                             ),
                             new SequentialAction(
                                     (telemetryPacket) -> { // Retract Arm and Clamp Releases
+                                        robot.pixelManipulator.slides.setPower(0);
+                                        robot.pixelManipulator.arm.setRetractPos();
                                         robot.pixelManipulator.arm.retract();
                                         robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.leftClamp);
                                         robot.pixelManipulator.claw.clampServo(robot.pixelManipulator.claw.rightClamp);
