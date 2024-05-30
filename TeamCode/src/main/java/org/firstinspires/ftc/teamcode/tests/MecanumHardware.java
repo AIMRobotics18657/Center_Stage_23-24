@@ -29,7 +29,7 @@ public class MecanumHardware {
         rightRear = hwMap.get(DcMotorEx.class, "brd");
 
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 }
 
